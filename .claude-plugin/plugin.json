@@ -1,0 +1,10 @@
+{
+  "name": "just-do-it",
+  "description": "Just do It - a full company in a single plugin. Specialist agents for engineering, security, marketing, sales, finance, HR, legal, product, design, and operations.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Lucas de Ataides",
+    "email": "lucasatab@gmail.com"
+  },
+  "keywords": ["workflow", "agents", "execution", "planning", "verification", "company"]
+}

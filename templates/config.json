@@ -1,0 +1,42 @@
+{
+  "model_profile": "balanced",
+  "model_overrides": {},
+  "mode": "interactive",
+  "fast_mode": false,
+  "agents": {
+    "coder": true,
+    "architect": true,
+    "security": true,
+    "reliability": true,
+    "qa": true,
+    "devops": true,
+    "reviewer": true,
+    "researcher": true,
+    "debugger": true,
+    "perf": true,
+    "migrator": true,
+    "integrator": true,
+    "data": true,
+    "strategist": true,
+    "marketer": true,
+    "sales": true,
+    "finance": true,
+    "legal": true,
+    "hr": true,
+    "product": true,
+    "designer": true,
+    "writer": true,
+    "ops": true,
+    "support": true,
+    "compliance": true
+  },
+  "parallelization": {
+    "enabled": true,
+    "max_concurrent": 4
+  },
+  "git": {
+    "auto_commit": false,
+    "use_branches": true,
+    "conventional_commits": true
+  }
+}

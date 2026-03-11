@@ -1,0 +1,34 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0] - 2026-03-11
+
+### Added
+
+- 25 specialist agents across 5 departments:
+  - Engineering (11): coder, architect, security, reliability, qa, devops, debugger, perf, integrator, migrator, data
+  - Business (5): strategist, marketer, sales, finance, ops
+  - People and Legal (4): hr, legal, compliance, support
+  - Product and Design (2): product, designer
+  - Cross-Cutting (3): researcher, reviewer, writer
+- Full execution pipeline: research -> plan -> build -> verify
+- `/do:brainstorm` command for interactive idea exploration before starting
+- `/do:start` command for full pipeline execution
+- `/do:discover` command to scan existing codebases and generate agent context
+- `/do:setup` command for interactive project setup (greenfield)
+- `/do:plan`, `/do:build`, `/do:verify` for individual phase control
+- `/do:review` for multi-specialist code review
+- `/do:status`, `/do:resume`, `/do:save` for session management
+- `/do:settings` for configuration (model profiles, fast mode, git, agents)
+- Context layering system: base agent + project.md + department.md + agent-specific.md
+- Model profiles: quality (opus), balanced (sonnet), budget (haiku)
+- Per-agent model overrides in `.work/config.json`
+- Fast mode for reduced ceremony on well-understood work
+- Git workflow with conventional commits (branches and messages)
+- All git operations require explicit user approval
+- Session continuity via `.work/STATE.md`
+- Install and uninstall scripts
+- Full documentation in `docs/`

@@ -1,0 +1,139 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Generate changelog from commits
+        id: changelog
+        env:
+          GH_REF: ${{ github.ref }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          # Get the previous tag
+          PREVIOUS_TAG=$(git tag --sort=-creatordate | sed -n '2p')
+          CURRENT_TAG=${GH_REF#refs/tags/}
+          VERSION=${CURRENT_TAG#v}
+          TODAY=$(date +%Y-%m-%d)
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            COMMITS=$(git log "${PREVIOUS_TAG}..${CURRENT_TAG}" --pretty=format:"- %s (%h)" --no-merges)
+          fi
+
+          # Group by conventional commit type
+          FEATS=$(echo "$COMMITS" | grep -E "^- feat" || true)
+          FIXES=$(echo "$COMMITS" | grep -E "^- fix" || true)
+          REFACTORS=$(echo "$COMMITS" | grep -E "^- refactor" || true)
+          DOCS=$(echo "$COMMITS" | grep -E "^- docs" || true)
+          TESTS=$(echo "$COMMITS" | grep -E "^- test" || true)
+          CHORES=$(echo "$COMMITS" | grep -E "^- chore" || true)
+          OTHER=$(echo "$COMMITS" | grep -vE "^- (feat|fix|refactor|docs|test|chore)" || true)
+
+          # Build release body
+          RELEASE_BODY=""
+          if [ -n "$FEATS" ]; then
+            RELEASE_BODY="${RELEASE_BODY}### New Features\n${FEATS}\n\n"
+          fi
+          if [ -n "$FIXES" ]; then
+            RELEASE_BODY="${RELEASE_BODY}### Bug Fixes\n${FIXES}\n\n"
+          fi
+          if [ -n "$REFACTORS" ]; then
+            RELEASE_BODY="${RELEASE_BODY}### Refactoring\n${REFACTORS}\n\n"
+          fi
+          if [ -n "$DOCS" ]; then
+            RELEASE_BODY="${RELEASE_BODY}### Documentation\n${DOCS}\n\n"
+          fi
+          if [ -n "$TESTS" ]; then
+            RELEASE_BODY="${RELEASE_BODY}### Tests\n${TESTS}\n\n"
+          fi
+          if [ -n "$CHORES" ]; then
+            RELEASE_BODY="${RELEASE_BODY}### Maintenance\n${CHORES}\n\n"
+          fi
+          if [ -n "$OTHER" ]; then
+            RELEASE_BODY="${RELEASE_BODY}### Other\n${OTHER}\n\n"
+          fi
+
+          # Build changelog entry for CHANGELOG.md
+          CHANGELOG_ENTRY="## [${VERSION}] - ${TODAY}\n\n"
+          if [ -n "$FEATS" ]; then
+            CHANGELOG_ENTRY="${CHANGELOG_ENTRY}### Added\n\n${FEATS}\n\n"
+          fi
+          if [ -n "$FIXES" ]; then
+            CHANGELOG_ENTRY="${CHANGELOG_ENTRY}### Fixed\n\n${FIXES}\n\n"
+          fi
+          if [ -n "$REFACTORS" ]; then
+            CHANGELOG_ENTRY="${CHANGELOG_ENTRY}### Changed\n\n${REFACTORS}\n\n"
+          fi
+          if [ -n "$DOCS" ]; then
+            CHANGELOG_ENTRY="${CHANGELOG_ENTRY}### Documentation\n\n${DOCS}\n\n"
+          fi
+          if [ -n "$TESTS" ]; then
+            CHANGELOG_ENTRY="${CHANGELOG_ENTRY}### Tests\n\n${TESTS}\n\n"
+          fi
+          if [ -n "$CHORES" ]; then
+            CHANGELOG_ENTRY="${CHANGELOG_ENTRY}### Maintenance\n\n${CHORES}\n\n"
+          fi
+          if [ -n "$OTHER" ]; then
+            CHANGELOG_ENTRY="${CHANGELOG_ENTRY}### Other\n\n${OTHER}\n\n"
+          fi
+
+          # Save release body
+          {
+            echo "body<<RELEASE_EOF"
+            echo -e "## What's Changed\n\n${RELEASE_BODY}**Full Changelog**: https://github.com/${GH_REPO}/compare/${PREVIOUS_TAG:-initial}...${CURRENT_TAG}"
+            echo "RELEASE_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          # Update CHANGELOG.md - insert new entry after the header
+          if [ -f CHANGELOG.md ]; then
+            # Insert after the "adheres to Semantic Versioning" line (end of header)
+            ESCAPED_ENTRY=$(echo -e "$CHANGELOG_ENTRY" | sed 's/[&/\]/\\&/g')
+            awk -v entry="$(echo -e "$CHANGELOG_ENTRY")" '
+              /^## \[/ && !inserted {
+                print entry
+                inserted=1
+              }
+              { print }
+            ' CHANGELOG.md > CHANGELOG.tmp && mv CHANGELOG.tmp CHANGELOG.md
+          else
+            # Create new CHANGELOG.md
+            {
+              echo "# Changelog"
+              echo ""
+              echo "All notable changes to this project will be documented in this file."
+              echo ""
+              echo "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)."
+              echo ""
+              echo -e "$CHANGELOG_ENTRY"
+            } > CHANGELOG.md
+          fi
+
+      - name: Commit updated CHANGELOG.md
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git diff --staged --quiet || git commit -m "chore: update CHANGELOG.md for ${GITHUB_REF#refs/tags/}"
+          git push origin main
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.changelog.outputs.body }}
+          generate_release_notes: false
