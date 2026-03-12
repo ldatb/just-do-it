@@ -1,5 +1,5 @@
 ---
-name: do:go
+name: do:it
 description: Just do it. Skip ceremony, execute fast. For well-understood tasks.
 argument-hint: <what to do>
 allowed-tools:

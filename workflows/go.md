@@ -1,6 +1,7 @@
 <purpose>
-"Just do it" - minimal ceremony execution. For well-understood tasks where you know what you want.
-Skips brainstorming. Brief research. Single-wave plan. Fast verify. Only stops for git and CRITICAL findings.
+"Just do it" - zero ceremony execution. For well-understood tasks where you know what you want.
+Skips brainstorming. Brief research. Single-wave plan. Fast verify. Only stops for CRITICAL findings.
+The user already said "go" — don't ask again.
 </purpose>
 
 <process>
@@ -42,15 +43,7 @@ Create a single-wave `PLAN.md`:
 - Tasks: minimal list, all in one wave
 - Each task: agent + what to do
 
-Show the plan briefly to the user.
-
-Use AskUserQuestion:
-- header: "Quick Plan"
-- question: "Plan for: [goal]. Build it?"
-- options:
-  - "Yes, go" - execute immediately
-  - "Adjust" - modify before building
-  - "Stop" - save and exit
+Show the plan as a brief summary in output. Do NOT ask for approval. Proceed immediately.
 
 ## 5. Build (Single Wave)
 
@@ -59,14 +52,9 @@ Use AskUserQuestion:
 3. Compile results into `BUILD.md`
 
 After build, if code was modified and git is configured:
-
-Use AskUserQuestion:
-- header: "Commit"
-- question: "Done. Commit changes? [show files + proposed message]"
-- options:
-  - "Yes, commit" - commit with proposed message
-  - "Edit message" - modify commit message
-  - "Skip" - don't commit
+- Auto-commit using conventional commit format derived from the goal
+- Report the commit message and affected files in output
+- Do NOT ask for permission
 
 ## 6. Quick Verify
 
@@ -98,6 +86,8 @@ Show a one-line summary: "Done: [what was built]. [N files modified]."
 - Speed over ceremony. Every prompt that can be skipped, skip it.
 - One-wave only. No multi-wave plans.
 - Brief output. No verbose logs.
-- Git approval is the only mandatory stop (plus CRITICAL findings).
+- The only allowed stop is CRITICAL findings (step 6). Everything else: just do it.
+- Plan is shown, not approved.
+- Commits are automatic, not confirmed.
 - If the task fails, fall back to full /do:start for a more structured approach.
 </guidelines>

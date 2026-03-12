@@ -1,6 +1,6 @@
 <purpose>
 Execute the current or specified phase's plan. Dispatches specialist agents per task in wave order.
-Always interactive - user approves each wave and each commit.
+Config drives decisions - read settings and act. Do not prompt unless a task fails.
 </purpose>
 
 <process>
@@ -21,27 +21,17 @@ Always interactive - user approves each wave and each commit.
 For each wave in PLAN.md:
 
 1. Collect all tasks in this wave
-2. Show what will be executed:
-
-   Use AskUserQuestion:
-   - header: "Wave N - [N tasks]"
-   - question: "Dispatching agents: [list]. Proceed?"
-   - options:
-     - "Yes, execute this wave"
-     - "Skip this wave"
-     - "Save for later" - save state and stop
-
-3. For each task:
+2. For each task:
    - Resolve the model for the task's agent using config
    - Prepare the task prompt with:
      - Project context files (.work/context/)
      - Phase plan (PLAN.md path)
      - Specific task details
      - Files to read/modify
-4. Dispatch all wave tasks in parallel (up to `max_concurrent`)
-5. Collect results from all agents
-6. Update BUILD.md with results
-7. Update STATE.md with wave progress
+3. Dispatch all wave tasks in parallel (up to `max_concurrent`)
+4. Collect results from all agents
+5. Update BUILD.md with results
+6. Update STATE.md with wave progress
 
 **If any task fails:**
 
@@ -56,20 +46,13 @@ Use AskUserQuestion:
 
 ### Git After Each Wave
 
-If code was modified and `git.conventional_commits` is true:
+If code was modified and `git.conventional_commits` is true in config:
 
-1. Show changed files and propose commit message (conventional format)
+1. Generate a conventional commit message from the wave's task descriptions and changed files
+2. Stage specific files changed during this wave (never `git add .`)
+3. Commit automatically - do not prompt
 
-   Use AskUserQuestion:
-   - header: "Commit Wave N Changes"
-   - question: "Commit: '<type>: <description>'?\n\nFiles: [list]"
-   - options:
-     - "Yes, commit"
-     - "Edit message"
-     - "Skip commit"
-
-2. Stage specific files (never `git add .`)
-3. Commit only if user approves
+If `git.conventional_commits` is false or absent, skip the commit step entirely.
 
 ## 3. Compile Results
 

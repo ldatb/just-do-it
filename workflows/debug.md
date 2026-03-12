@@ -1,6 +1,7 @@
 <purpose>
 Debug an issue using scientific method. Dispatch do-debugger to investigate, reproduce, hypothesize, and fix.
 Standalone entry point for bug investigation outside the build pipeline.
+Config-driven: only prompts when genuinely ambiguous or when presenting fix options.
 </purpose>
 
 <process>
@@ -18,7 +19,7 @@ From $ARGUMENTS, identify:
 - **Location**: which files/modules/endpoints are involved (if known)
 - **Reproduction**: how to trigger the issue (if known)
 
-If $ARGUMENTS is vague, ask one clarifying question:
+If $ARGUMENTS is too vague to act on (less than a few words, no error info), ask one clarifying question:
 
 Use AskUserQuestion:
 - header: "Debug"
@@ -28,6 +29,8 @@ Use AskUserQuestion:
   - "A test is failing" - user will specify which test
   - "Unexpected behavior" - user will describe what happens vs expected
   - "Performance issue" - something is slow
+
+If $ARGUMENTS is specific enough, skip the prompt and proceed.
 
 ## 3. Investigate
 
@@ -46,7 +49,7 @@ Dispatch `do-debugger` agent with:
 
 If performance-related, also dispatch `do-perf` in parallel.
 
-## 4. Present Findings
+## 4. Present Findings and Apply Fix
 
 Show the user:
 - **Root cause**: what's wrong and why
@@ -60,24 +63,12 @@ Use AskUserQuestion:
   - "Yes, fix it" - apply the proposed changes
   - "Show me the details" - see full investigation before deciding
   - "I'll fix it myself" - user takes over with the diagnosis info
-  - "Investigate more" - not convinced, dig deeper
 
-## 5. Apply Fix
+## 5. Commit (if fix applied)
 
-If user approves:
-1. Dispatch `do-coder` to implement the fix (or apply directly if simple)
-2. Run relevant tests to verify the fix
-3. Show results
-
-If git is configured:
-
-Use AskUserQuestion:
-- header: "Commit Fix"
-- question: "Fix applied and tests pass. Commit?"
-- options:
-  - "Yes, commit" - commit with `fix: <description>`
-  - "Edit message" - modify commit message
-  - "Skip" - don't commit
+If fix was applied and `git.conventional_commits` is true in config:
+- Auto-commit with `fix: <description>` message
+- Stage only the modified files
 
 ## 6. Update State
 

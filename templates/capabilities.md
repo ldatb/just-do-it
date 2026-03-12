@@ -16,7 +16,7 @@ This file describes what the plugin can do. Generated during setup/discover.
 <!-- List enabled agents from config.json -->
 
 ## Commands
-- `/do:go` - Just do it. Minimal ceremony, fast execution.
+- `/do:it` - Just do it. Minimal ceremony, fast execution.
 - `/do:start` - Full pipeline: research, plan, build, verify.
 - `/do:brainstorm` - Explore and refine an idea before building.
 - `/do:research` - Research a topic or technology.

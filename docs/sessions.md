@@ -256,7 +256,7 @@ Switch modes:
 /do:settings fast_mode off
 ```
 
-For the fastest possible execution, use `/do:go "task"` which enables fast mode automatically.
+For the fastest possible execution, use `/do:it "task"` which enables fast mode automatically.
 
 ---
 

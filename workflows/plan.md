@@ -1,5 +1,6 @@
 <purpose>
-Plan the current or specified phase. Creates PLAN.md with tasks, waves, and success criteria.
+Plan the current or specified phase. Creates PLAN.md with tasks, waves, agent assignments, and success criteria.
+The plan MUST include all relevant agents - not just do-coder. Use the agent dispatch rules below.
 </purpose>
 
 <process>
@@ -8,7 +9,7 @@ Plan the current or specified phase. Creates PLAN.md with tasks, waves, and succ
 
 1. Read `.work/STATE.md` for current position
 2. Read `.work/PROJECT.md` for project context
-3. Read `.work/config.json` for settings
+3. Read `.work/config.json` for settings (enabled agents, fast_mode)
 4. Determine which phase to plan:
    - If $ARGUMENTS contains a phase number, use that
    - Otherwise, use current phase from STATE.md
@@ -17,29 +18,135 @@ Plan the current or specified phase. Creates PLAN.md with tasks, waves, and succ
 
 Read the phase directory `.work/phases/XX-<name>/`:
 - `RESEARCH.md` if it exists (research findings)
+- `BRAINSTORM.md` if it exists (brainstorm output)
 If no research exists, do a quick research pass first (dispatch `do-researcher`).
 
-## 3. Create Plan
+## 3. Classify Work and Select Agents
 
-Create `PLAN.md` in the phase directory with:
+**This step is critical. Plans that only dispatch do-coder produce incomplete work.**
 
-1. **Goal:** One sentence - what this phase delivers
-2. **Requirements Covered:** REQ-IDs from PROJECT.md
-3. **Tasks by Wave:**
-   - Wave 1: Tasks that can run in parallel
-   - Wave 2+: Tasks that depend on previous waves
-   - Each task has: agent, files, action, verify, done
-4. **Success Criteria:** How we know the phase is complete
+### Step 3a: Classify the work domain
 
-## 4. Present Plan
+Read the phase goal and categorize:
+- **Engineering** - code changes, architecture, infrastructure
+- **Business** - marketing, sales, finance, strategy
+- **People** - HR, legal, compliance
+- **Product** - product decisions, design
+- **Mixed** - spans multiple domains
 
-Show the plan to the user. Ask for approval or modifications.
+### Step 3b: Select agents using dispatch rules
 
-## 5. Update State
+For EACH phase of execution (Build, then Verify), determine which agents run.
+
+**BUILD phase agent selection:**
+
+| Condition | Agents to Include |
+| --------- | ----------------- |
+| Always for code tasks | `do-coder` |
+| Architecture decisions involved | `do-architect` (Wave 1, before coder) |
+| Auth, crypto, security touched | `do-security` |
+| Error handling, resilience touched | `do-reliability` |
+| CI/CD, infra, deploy touched | `do-devops` |
+| Database migrations involved | `do-migrator` |
+| External API integrations | `do-integrator` |
+| Performance-sensitive code | `do-perf` |
+| Marketing/content work | `do-marketer`, `do-writer` |
+| Sales deliverables | `do-sales`, `do-writer` |
+| HR/people work | `do-hr`, `do-writer` |
+| Legal/compliance work | `do-legal`, `do-compliance` |
+| Product decisions needed | `do-product` |
+| Design/UX work | `do-designer` |
+
+**VERIFY phase agent selection:**
+
+| Condition | Agents to Include |
+| --------- | ----------------- |
+| Always for code tasks | `do-qa`, `do-reviewer` |
+| Security-relevant changes | `do-security` |
+| Error handling changes | `do-reliability` |
+| Infra changes | `do-devops` |
+| Performance-sensitive | `do-perf` |
+| Compliance-relevant | `do-compliance` |
+| Business deliverables | `do-strategist` |
+| People/legal deliverables | `do-legal`, `do-ops` |
+
+**Fast mode**: Verify uses only `do-qa` + `do-reviewer` (skip conditional agents).
+
+### Step 3c: Check agent availability
+
+Cross-reference selected agents with `config.agents` - only include agents that are enabled (true).
+
+## 4. Organize into Waves
+
+Group tasks into waves based on dependencies:
+
+**Wave ordering rules:**
+1. `do-architect` runs FIRST (Wave 1) - design decisions before implementation
+2. `do-product` runs FIRST (Wave 1) - product decisions before implementation
+3. `do-coder` runs AFTER architect/product (Wave 2+)
+4. `do-security` can run in parallel with coder OR after (depends on task)
+5. `do-qa`, `do-reviewer` run LAST (Verify wave)
+6. Independent agents can run in parallel within the same wave
+
+**Example wave structure for "Add OAuth2 login":**
+```
+Wave 1 (Design):     do-architect, do-product
+Wave 2 (Build):      do-coder, do-security (parallel)
+Wave 3 (Verify):     do-qa, do-reviewer, do-security, do-reliability
+```
+
+## 5. Create PLAN.md
+
+Write `PLAN.md` in the phase directory:
+
+```markdown
+# Plan: [Phase Name]
+
+## Goal
+[One sentence]
+
+## Agents
+- Build: [list of agents for build waves]
+- Verify: [list of agents for verify wave]
+
+## Wave 1: [Name]
+### Task 1.1: [Agent] - [Action]
+- Files: [files to read/modify]
+- Done when: [criteria]
+
+### Task 1.2: [Agent] - [Action]
+- Files: [files to read/modify]
+- Done when: [criteria]
+
+## Wave 2: [Name]
+### Task 2.1: [Agent] - [Action]
+...
+
+## Verify Wave
+### [Agent] - [Review focus]
+...
+
+## Success Criteria
+[How we know the phase is complete]
+```
+
+## 6. Present Plan
+
+Show the plan to the user. This is a mandatory approval gate.
+
+Use AskUserQuestion:
+- header: "Plan"
+- question: "Plan ready. [N] agents across [M] waves. Build it?"
+- options:
+  - "Go" - start execution
+  - "Adjust" - modify the plan
+  - "Stop" - save and exit
+
+## 7. Update State
 
 Update STATE.md:
 - Step: plan
-- Status: complete (or awaiting approval)
-- Next Action: "Build phase XX" or "Revise plan"
+- Status: complete
+- Next Action: "Build phase XX"
 
 </process>

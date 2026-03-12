@@ -1,5 +1,5 @@
 <purpose>
-Save current work state for later resumption.
+Save current work state for later resumption. Config-driven: auto-commits if configured.
 </purpose>
 
 <process>
@@ -27,19 +27,10 @@ Write to STATE.md:
 
 Read `.work/config.json` for git settings.
 
-If `git.auto_commit` is true:
+If `git.conventional_commits` is true, auto-commit state files:
 
-Use AskUserQuestion to confirm:
-- header: "Save to Git"
-- question: "Commit .work/ state to git?"
-- options:
-  - "Yes" - commit planning docs
-  - "No" - save locally only
-
-If confirmed, stage specific files:
 ```bash
 git add .work/STATE.md .work/PROJECT.md .work/config.json
-# Also stage any phase docs that were created/modified this session
 git add .work/phases/*/RESEARCH.md .work/phases/*/PLAN.md .work/phases/*/BUILD.md .work/phases/*/VERIFY.md
 git commit -m "chore: save work state - phase XX step"
 ```

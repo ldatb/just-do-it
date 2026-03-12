@@ -127,7 +127,7 @@ Your `.work/` project directories are not removed.
 ### Just do it (fast)
 
 ```bash
-/do:go "add user authentication"    # skip ceremony, just build it
+/do:it "add user authentication"    # skip ceremony, just build it
 ```
 
 ### Full pipeline
@@ -236,7 +236,7 @@ Discovery generates agent-specific context files (coder.md, security.md, qa.md, 
 
 | Command | What it does |
 | ------- | ----------- |
-| `/do:go "task"` | **Just do it.** Minimal ceremony, fast execution. |
+| `/do:it "task"` | **Just do it.** Minimal ceremony, fast execution. |
 | `/do:start "task"` | Full pipeline: research -> plan -> build -> verify |
 | `/do:brainstorm "topic"` | Explore and refine an idea before building |
 | `/do:help` | Show all commands and usage |

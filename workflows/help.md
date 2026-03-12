@@ -12,7 +12,7 @@ Display the following:
 Just do It - Command Reference
 
 QUICK START
-  /do:go "task"           Just do it. Minimal ceremony, fast execution.
+  /do:it "task"           Just do it. Minimal ceremony, fast execution.
   /do:start "task"        Full pipeline: research, plan, build, verify.
   /do:brainstorm "topic"  Explore and refine an idea before building.
 

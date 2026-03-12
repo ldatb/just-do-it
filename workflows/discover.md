@@ -303,7 +303,7 @@ Use AskUserQuestion:
 Update STATE.md:
 - Status: discovered
 - Last Action: Deep codebase discovery complete ([N] context files generated)
-- Next Action: Ready for work - use `/do:start`, `/do:go`, or `/do:plan`
+- Next Action: Ready for work - use `/do:start`, `/do:it`, or `/do:plan`
 
 </process>
 

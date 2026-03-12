@@ -8,7 +8,7 @@ The "Just do It" system uses specialist agents organized by department. Each age
 | Agent | Domain | Dispatched When |
 | ----- | ------ | --------------- |
 | `do-coder` | Implementation | Always during Build for code tasks |
-| `do-architect` | System design, trade-offs | Architecture decisions, tech strategy |
+| `do-architect` | System design, trade-offs | Architecture decisions, tech strategy. Runs BEFORE coder. |
 | `do-security` | AppSec, OWASP, secrets | Build + Verify when auth/crypto/input touched |
 | `do-reliability` | Error handling, resilience | Build + Verify when error paths/data touched |
 | `do-qa` | Testing, coverage | Always during Verify for code tasks |
@@ -39,7 +39,7 @@ The "Just do It" system uses specialist agents organized by department. Each age
 ### Product & Design
 | Agent | Domain | Dispatched When |
 | ----- | ------ | --------------- |
-| `do-product` | PRDs, roadmaps, prioritization | Product decisions |
+| `do-product` | PRDs, roadmaps, prioritization | Product decisions. Runs BEFORE coder. |
 | `do-designer` | UI/UX, branding, design systems | Design tasks |
 
 ### Cross-Cutting
@@ -49,21 +49,47 @@ The "Just do It" system uses specialist agents organized by department. Each age
 | `do-reviewer` | Code quality, doc quality | Always during Verify |
 | `do-writer` | Docs, comms, content | Writing-heavy deliverables |
 
-## Dispatch Logic
+## Mandatory Dispatch Rules
 
-The orchestrator classifies work into a domain, then dispatches the relevant specialists:
+**These rules are NOT optional. The plan MUST include all relevant agents.**
 
-1. **Classify** - What kind of work is this? (code, marketing, sales, ops, etc.)
-2. **Select primary agents** - Which specialists own this domain?
-3. **Select supporting agents** - Which cross-cutting specialists add value?
-4. **Resolve models** - Look up each agent's model from the profile
-5. **Dispatch in parallel** - Send all agents simultaneously where possible
+### For any code task:
+- **Build**: `do-coder` (always) + conditional specialists
+- **Verify**: `do-qa` + `do-reviewer` (always) + conditional specialists
 
-### Example Dispatches
+### Conditional dispatch (check EVERY condition):
+
+| If the work involves... | Add to Build | Add to Verify |
+| ----------------------- | ------------ | ------------- |
+| Architecture/design decisions | `do-architect` (Wave 1) | - |
+| Product/UX decisions | `do-product` (Wave 1) | - |
+| Auth, crypto, secrets, user input | `do-security` | `do-security` |
+| Error handling, retries, data integrity | `do-reliability` | `do-reliability` |
+| CI/CD, Docker, infra, deploy config | `do-devops` | `do-devops` |
+| Performance-sensitive code | `do-perf` | `do-perf` |
+| Database schema or migrations | `do-migrator` | - |
+| External API/webhook integration | `do-integrator` | - |
+| SQL, analytics, data pipelines | `do-data` | - |
+| Compliance-relevant changes | - | `do-compliance` |
+
+### Wave ordering:
+1. **Design wave**: `do-architect`, `do-product` (decisions first)
+2. **Build wave(s)**: `do-coder` + domain specialists (implementation)
+3. **Verify wave**: `do-qa`, `do-reviewer` + conditional specialists (review)
+
+Design agents run BEFORE implementation agents. Always.
+
+## Example Dispatches
 
 **"Add OAuth2 login"** (Engineering)
-- Build: `do-coder`, `do-security`, `do-architect`
-- Verify: `do-qa`, `do-reviewer`, `do-security`, `do-reliability`
+- Wave 1 (Design): `do-architect`
+- Wave 2 (Build): `do-coder`, `do-security`
+- Wave 3 (Verify): `do-qa`, `do-reviewer`, `do-security`, `do-reliability`
+
+**"Reduce prompts in workflow files"** (Engineering + Product)
+- Wave 1 (Design): `do-architect`, `do-product`
+- Wave 2 (Build): `do-coder`
+- Wave 3 (Verify): `do-qa`, `do-reviewer`, `do-security`
 
 **"Write Q1 marketing plan"** (Business)
 - Research: `do-researcher`
@@ -87,3 +113,5 @@ The orchestrator classifies work into a domain, then dispatches the relevant spe
 ## Parallel Execution
 
 During Build and Verify, agents run in parallel when they operate on independent concerns. The `max_concurrent` setting in config.json controls how many agents run simultaneously (default: 4).
+
+Exception: Design agents (architect, product) in Wave 1 must complete before Build agents in Wave 2 start.

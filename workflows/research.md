@@ -1,38 +1,28 @@
 <purpose>
 Standalone research on a topic, technology, or approach. Dispatches do-researcher agents
 and produces RESEARCH.md. Can run independently or feed into /do:plan.
+Config-driven: dispatches based on fast_mode setting, no unnecessary prompts.
 </purpose>
 
 <process>
 
 ## 1. Initialize
 
-1. Read `.work/config.json` if it exists (for model profile)
+1. Read `.work/config.json` if it exists (for model profile and fast_mode)
 2. Read `.work/context/project.md` if it exists (for project context)
 3. Determine output location:
    - If a current phase exists in STATE.md: write to that phase directory
    - Otherwise: write to `.work/` root
 
-## 2. Scope the Research
-
-From $ARGUMENTS, identify:
-- **Topic**: what to research
-- **Purpose**: why (comparing options, learning a technology, finding prior art, assessing risk)
-
-If the topic is broad, ask one scoping question:
-
-Use AskUserQuestion:
-- header: "Research"
-- question: "What angle matters most for this research?"
-- options:
-  - "Compare options" - evaluate alternatives, produce a recommendation
-  - "Find prior art" - existing implementations, libraries, patterns
-  - "Assess risk" - what could go wrong, common pitfalls
-  - "Deep dive" - thorough understanding of one technology/approach
-
-## 3. Dispatch Researchers
+## 2. Dispatch Researchers
 
 Resolve model for `do-researcher` from config.
+
+Infer research angle from $ARGUMENTS:
+- If comparing options: focus on alternatives and trade-offs
+- If exploring a technology: focus on prior art and best practices
+- If assessing risk: focus on pitfalls and failure modes
+- If unclear: cover all angles
 
 **If fast mode:** Single agent, focused on top 2-3 findings.
 
@@ -43,7 +33,7 @@ Resolve model for `do-researcher` from config.
 
 Each agent reads project context files before researching.
 
-## 4. Compile Findings
+## 3. Compile Findings
 
 Compile all agent outputs into `RESEARCH.md`:
 
@@ -71,22 +61,14 @@ Compile all agent outputs into `RESEARCH.md`:
 [Clear next step with rationale]
 ```
 
-## 5. Present Results
+## 4. Present Results
 
-Show the user a brief summary of findings.
+Show the user a brief summary of findings. No prompt needed - research is complete.
 
-Use AskUserQuestion:
-- header: "Research Done"
-- question: "Research complete. What next?"
-- options:
-  - "Plan it" - proceed to /do:plan with these findings
-  - "Research more" - dig deeper on a specific area
-  - "Done" - save findings and stop
-
-## 6. Update State
+## 5. Update State
 
 If `.work/STATE.md` exists, update:
 - Last Action: "Research: [topic]"
-- Next Action: based on user choice
+- Next Action: ready for planning or next task
 
 </process>

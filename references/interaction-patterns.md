@@ -2,26 +2,35 @@
 
 ## Core Principle
 
-**Always ask the user.** This plugin is interactive-first. Every significant decision gets user input via AskUserQuestion with selectable options.
+**Config drives decisions.** The plugin reads `.work/config.json` and acts accordingly. Prompts are reserved for decisions that config cannot answer: plan approval and critical findings.
 
-## When to Prompt
+## When to Prompt (ONLY these cases)
 
-| Situation | Prompt Type |
-| --------- | ---------- |
-| Brainstorm exploration (each round of the loop) | Clarify + offer next steps |
-| Phase transition (research -> plan -> build -> verify) | Confirm proceed |
-| Git commit | Approve message and files |
-| Git push | Approve target |
-| Agent dispatch | Show which agents, confirm |
-| Plan review | Approve or modify |
-| Verification findings | Choose: fix, defer, or ignore |
-| Destructive action (delete, overwrite) | Explicit confirmation |
-| Configuration change | Confirm new value |
-| Branch merge | Choose: merge, PR, or leave |
+| Situation | Why it needs a prompt |
+| --------- | -------------------- |
+| First-time setup (no config.json) | Need to know git, model, and mode preferences |
+| Plan review | Human must approve what agents will do |
+| CRITICAL verification findings | Human must decide: fix, defer, or override |
+| Debug fix approval | Human must approve changes to fix a bug |
+| Task failure during build | Human must decide: retry, skip, debug, or stop |
+
+## When NOT to Prompt (use config instead)
+
+| Situation | What config answers |
+| --------- | ------------------- |
+| Phase creation | Auto-create from STATE.md |
+| Git branch creation | `git.use_branches` in config |
+| Research dispatch | `fast_mode` in config |
+| Research review | Auto-proceed to planning |
+| Wave execution | Auto-dispatch from PLAN.md |
+| Git commits | `git.conventional_commits` in config - auto-commit |
+| Specialist selection for verify | `fast_mode` + file analysis |
+| Phase completion (PASS) | Auto-update STATE.md |
+| Branch merge | `git.use_branches` in config - auto-merge |
 
 ## AskUserQuestion Format
 
-Always use AskUserQuestion with selectable options for structured decisions:
+When a prompt IS needed, use AskUserQuestion with selectable options:
 
 ```
 Use AskUserQuestion:
@@ -33,75 +42,49 @@ Use AskUserQuestion:
   - "Option C" - brief description
 ```
 
-This renders as a selectable list the user can navigate with keyboard.
+Keep options to 2-3 max. No "Custom" or "Something else" options unless genuinely useful.
 
-## Prompt Categories
+## Prompt Reduction by Command
 
-### Confirmation Prompts (yes/no + escape hatch)
-```
-- "Yes, proceed"
-- "No, stop"
-- "Let me think" (pauses, saves state)
-```
-
-### Choice Prompts (pick one)
-```
-- "Option A" - description
-- "Option B" - description
-- "Option C" - description
-- "Custom" - enter your own
-```
-
-### Review Prompts (approve with modifications)
-```
-- "Looks good, proceed"
-- "Modify" - adjust before proceeding
-- "Reject" - start over
-- "Skip" - move on without this step
-```
-
-### Brainstorm Prompts (exploration loop)
-```
-- "[Specific suggestion A]" - contextual option
-- "[Specific suggestion B]" - contextual option
-- "Something else" - user types their own
-- "Explore this further" - dig deeper
-- "Consider alternatives" - different approaches
-- "Narrow scope" - simplify
-- "I'm ready - start building" - exit brainstorm
-- "Save brainstorm notes" - save without starting
-```
-
-Brainstorm prompts are unique because the first few options are contextual - they change
-every round based on the conversation. The last four options are always present as
-navigation controls. One question per round, never a list.
-
-## Fast Mode Differences
-
-In fast mode, some prompts are skipped:
-- Phase transitions auto-proceed (no confirmation)
-- Research summaries are brief
-- Verification only stops on CRITICAL findings
-
-**Fast mode NEVER skips:**
-- Git commit/push approval
-- Destructive action confirmation
-- Plan approval (always shown, but briefer)
-- CRITICAL verification findings
+| Command | Max Prompts | What they are |
+| ------- | ----------- | ------------- |
+| `/do:it` | 1 | CRITICAL findings only |
+| `/do:start` | 3 | First-time setup (once), plan approval, CRITICAL findings |
+| `/do:build` | 1 | Task failure only |
+| `/do:verify` | 1 | CRITICAL findings only |
+| `/do:research` | 0 | Config-driven, no prompts |
+| `/do:debug` | 2 | Vague input clarification, fix approval |
+| `/do:save` | 0 | Config-driven, no prompts |
+| `/do:brainstorm` | Many | Interactive by nature (this is the exception) |
+| `/do:discover` | 1 | Config recommendations |
+| `/do:settings` | Many | Interactive by nature (changing settings) |
 
 ## Dangerous Operations Warning
 
-The following operations always show a warning banner before prompting:
+The following operations always show a warning banner (but don't necessarily prompt):
 
 ```
-⚠ DANGEROUS OPERATION
-[Description of what will happen]
-This action cannot be easily undone.
+WARNING: [Description of what will happen]
 ```
 
 - Force push
 - Branch deletion
 - File deletion outside .work/
 - Database migrations
-- Production deployments
 - Overwriting uncommitted changes
+
+These show a warning in output but only prompt if the action is truly destructive and irreversible.
+
+## Git Auto-Commit Behavior
+
+When `git.conventional_commits` is true:
+1. After each build wave: auto-commit modified files with `<type>: <description>`
+2. After save: auto-commit state files with `chore: save work state`
+3. After debug fix: auto-commit with `fix: <description>`
+4. Stage specific files only (never `git add .`)
+5. Generate conventional commit message from the work done
+6. No prompt needed - the user configured this behavior
+
+When `git.conventional_commits` is false:
+- No git operations happen automatically
+- User manages git manually
