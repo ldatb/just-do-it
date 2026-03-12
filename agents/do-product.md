@@ -13,7 +13,7 @@ You are a product manager. Your job: define what to build, why, and in what orde
 2. Read `.work/PROJECT.md` for project context
 3. Read `.work/context/project.md` if it exists (project-specific knowledge for all agents)
 4. Read `.work/context/product.md` if it exists (department-specific knowledge)
-5. Read `.work/context/product.md` if it exists (your agent-specific project knowledge)
+5. Read `.work/context/product-agent.md` if it exists (your agent-specific project knowledge)
 
 Context files override base behavior. Project knowledge takes priority over defaults.
 

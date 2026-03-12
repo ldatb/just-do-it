@@ -67,7 +67,7 @@ If `.work/` already exists, it reads STATE.md and continues from where you left 
 
 ### 2. Pausing Work
 
-**Command:** `/do:pause`
+**Command:** `/do:save` (or `/do:pause` - they are aliases)
 
 What happens:
 1. Reads current STATE.md
@@ -83,10 +83,10 @@ What happens:
    - Next Action -> exactly what to do when resuming
    - Context -> decisions and state from this session
    - Pending -> incomplete items
-4. Optionally commits `.work/` to git (if `git.commit_planning_docs` is true)
-5. Confirms: "Work paused. Resume with `/do:resume`."
+4. Optionally commits state files to git (if `git.auto_commit` is true in config.json)
+5. Confirms: "Work saved. Resume with `/do:resume`."
 
-**You can also just close Claude Code.** The plugin updates STATE.md throughout execution, so even without an explicit pause, the state is recoverable. `/do:pause` just ensures a clean save point.
+**You can also just close Claude Code.** The plugin updates STATE.md throughout execution, so even without an explicit save, the state is recoverable. `/do:save` just ensures a clean save point.
 
 ### 3. Resuming Work
 
@@ -172,8 +172,7 @@ STATE.md is updated at every significant transition:
 
 When a phase completes, the system:
 1. Marks the phase as complete in STATE.md
-2. Moves phase directory to `.work/archive/` (optional)
-3. Creates the next phase directory
+2. Creates the next phase directory
 4. Updates STATE.md with the new phase
 5. Asks: proceed to next phase?
 
@@ -186,16 +185,18 @@ Context from previous phases is preserved:
 
 ## Git Integration
 
-If `git.commit_planning_docs` is true in config.json:
+If `git.auto_commit` is true in config.json:
 
 | Event | Git Action |
 | ----- | --------- |
 | PROJECT.md created | `git add .work/PROJECT.md && git commit` |
-| Phase research complete | `git add .work/phases/XX/ && git commit` |
-| Phase plan complete | `git add .work/phases/XX/ && git commit` |
-| Phase build complete | `git add .work/phases/XX/ && git commit` |
-| Phase verify complete | `git add .work/phases/XX/ && git commit` |
-| Work paused | `git add .work/ && git commit` |
+| Phase research complete | `git add .work/phases/XX/RESEARCH.md && git commit` |
+| Phase plan complete | `git add .work/phases/XX/PLAN.md && git commit` |
+| Phase build complete | `git add .work/phases/XX/BUILD.md && git commit` |
+| Phase verify complete | `git add .work/phases/XX/VERIFY.md && git commit` |
+| Work saved | `git add .work/STATE.md .work/PROJECT.md .work/config.json && git commit` |
+
+Always stage specific files - never `git add .work/`.
 
 Commit messages follow the format:
 ```
@@ -227,10 +228,11 @@ Session behavior is controlled by `.work/config.json`:
 ```json
 {
   "mode": "interactive",     // "interactive" = confirm at each step
-                              // "auto" = advance automatically
-  "auto_advance": false,      // Auto-proceed to next phase on completion
+  "fast_mode": false,        // Reduced ceremony when true
   "git": {
-    "commit_planning_docs": true  // Auto-commit .work/ changes
+    "auto_commit": false,    // Prompt to commit state changes
+    "use_branches": true,    // Create feature branches per phase
+    "conventional_commits": true  // feat:, fix:, chore:, etc.
   }
 }
 ```
@@ -242,16 +244,19 @@ Session behavior is controlled by `.work/config.json`:
 - Pauses after Verify to show findings
 - You control the pace
 
-### Auto Mode
-- Advances through steps automatically
-- Only stops on failures or CRITICAL findings
-- Good for well-understood work where you trust the agents
+### Fast Mode
+- Shorter research (1 agent instead of multiple)
+- Minimal plans (single wave)
+- Quick verify (qa + reviewer only)
+- Only stops for git approval and CRITICAL findings
 
 Switch modes:
 ```
-/do:settings mode auto
-/do:settings mode interactive
+/do:settings fast_mode on
+/do:settings fast_mode off
 ```
+
+For the fastest possible execution, use `/do:go "task"` which enables fast mode automatically.
 
 ---
 
@@ -259,7 +264,7 @@ Switch modes:
 
 1. **Always check `/do:status` when starting a new Claude Code session** - it tells you exactly where you are.
 
-2. **Use `/do:pause` before closing** if you want a clean save point with full context.
+2. **Use `/do:save` (or `/do:pause`) before closing** if you want a clean save point with full context.
 
 3. **STATE.md is human-readable** - you can edit it directly if the system gets confused about where you are.
 

@@ -2,6 +2,8 @@
 
 Fast mode reduces ceremony to get work done quickly. Toggle with `/do:settings fast_mode on`.
 
+For the fastest experience, use `/do:go "task"` which enables fast mode automatically and skips most prompts.
+
 ## What Changes in Fast Mode
 
 | Phase | Normal Mode | Fast Mode |

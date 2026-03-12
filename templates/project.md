@@ -17,5 +17,8 @@
 ## Constraints
 <!-- Technical, business, or timeline constraints -->
 
+## Timeline
+<!-- Deadlines, milestones, urgency level -->
+
 ## Key Decisions
 <!-- Important decisions made and their rationale -->

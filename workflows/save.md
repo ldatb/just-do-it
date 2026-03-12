@@ -36,11 +36,15 @@ Use AskUserQuestion to confirm:
   - "Yes" - commit planning docs
   - "No" - save locally only
 
-If confirmed:
+If confirmed, stage specific files:
 ```bash
-git add .work/
+git add .work/STATE.md .work/PROJECT.md .work/config.json
+# Also stage any phase docs that were created/modified this session
+git add .work/phases/*/RESEARCH.md .work/phases/*/PLAN.md .work/phases/*/BUILD.md .work/phases/*/VERIFY.md
 git commit -m "chore: save work state - phase XX step"
 ```
+
+Never use `git add .work/` - stage specific files to avoid committing backups, temp files, or secrets.
 
 ## 4. Confirm
 

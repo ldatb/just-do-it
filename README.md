@@ -124,11 +124,17 @@ Your `.work/` project directories are not removed.
 
 ## Quick Start
 
-### Existing codebase
+### Just do it (fast)
 
 ```bash
-/do:discover                        # scans your code, generates context for agents
-/do:start "add user authentication" # start working
+/do:go "add user authentication"    # skip ceremony, just build it
+```
+
+### Full pipeline
+
+```bash
+/do:discover                        # deep codebase scan, generates agent context
+/do:start "add user authentication" # research -> plan -> build -> verify
 ```
 
 ### New project
@@ -143,6 +149,12 @@ Your `.work/` project directories are not removed.
 ```bash
 /do:brainstorm                      # explore and refine your idea with Claude
 /do:start "the refined description" # then start with a clear scope
+```
+
+### Debug something
+
+```bash
+/do:debug "login endpoint returns 500" # scientific debugging with specialist
 ```
 
 ## 25 Specialist Agents
@@ -212,28 +224,44 @@ Base agent (global)           -> "I'm a security expert"
 
 Context lives in `.work/context/` and is generated automatically:
 
-- `/do:discover` - 4 parallel agents scan your codebase (stack, architecture, quality, conventions)
+- `/do:discover` - 6 parallel agents deep-scan your codebase (stack, architecture, quality, conventions, git history, security)
 - `/do:setup` - interactive Q&A for new projects
 - Or edit the markdown files directly
 
+Discovery generates agent-specific context files (coder.md, security.md, qa.md, devops.md, reviewer.md, architect.md, reliability.md, debugger.md) so every agent has deep, project-specific knowledge.
+
 ## Commands
 
-### Core Workflow
+### Quick Start
 
 | Command | What it does |
 | ------- | ----------- |
-| `/do:brainstorm "topic"` | Brainstorm with Claude to explore and refine what to build |
-| `/do:start "description"` | Full pipeline: research -> plan -> build -> verify |
-| `/do:discover` | Scan existing codebase, generate project context |
+| `/do:go "task"` | **Just do it.** Minimal ceremony, fast execution. |
+| `/do:start "task"` | Full pipeline: research -> plan -> build -> verify |
+| `/do:brainstorm "topic"` | Explore and refine an idea before building |
+| `/do:help` | Show all commands and usage |
+
+### Project Setup
+
+| Command | What it does |
+| ------- | ----------- |
+| `/do:discover` | Deep codebase scan, generate agent context files |
 | `/do:setup` | Interactive project setup for new projects |
 
-### Phase Control
+### Pipeline Steps (standalone)
 
 | Command | What it does |
 | ------- | ----------- |
+| `/do:research "topic"` | Research a topic, technology, or approach |
 | `/do:plan` | Plan the current phase |
 | `/do:build` | Build the current phase with specialist agents |
 | `/do:verify` | Multi-specialist verification of current phase |
+
+### Tools
+
+| Command | What it does |
+| ------- | ----------- |
+| `/do:debug "issue"` | Debug a bug with the specialist agent |
 | `/do:review [path or PR#]` | Code review with relevant specialists |
 
 ### Session Management
@@ -242,7 +270,7 @@ Context lives in `.work/context/` and is generated automatically:
 | ------- | ----------- |
 | `/do:status` | Show current position and next action |
 | `/do:resume` | Continue from saved state |
-| `/do:save` | Save session state for later |
+| `/do:save` / `/do:pause` | Save session state for later |
 | `/do:settings` | Configure model profiles, agents, git, etc. |
 
 ## Git Workflow
