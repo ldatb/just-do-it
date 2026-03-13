@@ -11,7 +11,7 @@
 <br>
 
 ```bash
-git clone https://github.com/yourusername/just-do-it.git && cd just-do-it && ./install.sh
+git clone https://github.com/ldatb/just-do-it.git && cd just-do-it && ./install.sh
 ```
 
 <br>
