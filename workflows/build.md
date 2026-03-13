@@ -2,8 +2,8 @@
 Execute the current or specified phase's plan. Dispatches specialist agents per task in wave order.
 The plan is already approved — just execute it. Only ask on task failure.
 
-**You are an orchestrator.** Use the Agent tool to dispatch specialist agents.
-Do NOT write application code yourself.
+**You are a LEAN orchestrator.** Your job is to dispatch agents and track progress.
+You do NOT write application code. You do NOT carry agent results in your context.
 </purpose>
 
 <process>
@@ -24,34 +24,70 @@ Do NOT write application code yourself.
 For each wave in PLAN.md:
 
 1. Collect all tasks in this wave
-2. For each task:
-   - Resolve the model for the task's agent using config
-   - Prepare the task prompt with:
-     - Project context files (.work/context/)
-     - Phase plan (PLAN.md path)
-     - Specific task details
-     - Files to read/modify
+2. For each task, prepare the agent prompt with:
+   - **File paths to read** (not file contents — let the agent read them in its own context):
+     - `.work/context/project.md`
+     - `.work/context/engineering.md` (if exists)
+     - `.work/context/<agent-specific>.md` (if exists)
+     - `.work/phases/XX-<name>/PLAN.md`
+     - `./CLAUDE.md` (if exists)
+   - **Task details**: what to do, which files to create/modify, done criteria
+   - **Absolute paths** for ALL files the agent will write to
 3. **Use the Agent tool** to dispatch all wave tasks in parallel (up to `max_concurrent`)
-4. Collect results from all agents
-5. Update BUILD.md with results
-6. Update STATE.md with wave progress
-7. Brief status update to user: "Wave N complete. [summary of what was done]."
+4. When agents complete, note: files modified, success/failure, brief summary
+5. Update STATE.md with wave progress
+6. Brief status update to user: "Wave N complete. [summary]."
 
-**CRITICAL: "Dispatch" means use the Agent tool with the correct `subagent_type` (e.g., `do-coder`, `do-architect`, `do-security`).
-You are an orchestrator. You do NOT write application code yourself. You launch specialist agent subprocesses.**
+### Agent Prompt Template
 
-**No decision questions during build.** The plan was already approved. Just execute it.
+Each agent prompt MUST include:
 
-### File Permissions for Agents
+```
+Read these files before starting:
+- [list of context file PATHS — not contents]
+- [phase PLAN.md path]
+- [CLAUDE.md path if exists]
 
-Subagents inherit the parent's permission settings but CANNOT prompt for new permissions —
-they fail silently if denied. To prevent this:
+Your task from the plan:
+[paste the specific task section from PLAN.md]
 
-1. **Use absolute paths** in agent prompts — list every file the agent will need to create or modify
-2. **If agents need to write outside the project directory** (e.g., external repos, shared packages),
-   tell the user upfront which paths will be touched and let them approve before dispatching
-3. **If an agent fails due to permissions**, surface it to the user immediately — do NOT silently
-   retry or do the work yourself
+Files you will create/modify:
+[absolute paths]
+
+When done, write a brief summary to:
+.work/phases/XX-<name>/agent-results/<agent-name>.md
+```
+
+**CRITICAL: Pass file PATHS to agents, not file CONTENTS.** Each agent gets a fresh 200k
+context window. Let them read files themselves. This keeps the orchestrator lean.
+
+### Context Management (CRITICAL)
+
+The #1 cause of context exhaustion is the orchestrator carrying too much data.
+
+**DO:**
+- Pass file paths to agents (they read in their own context)
+- Have agents write their results to `.work/phases/XX/agent-results/` files
+- Read only the summary line from agent results, not full output
+- Keep orchestrator messages short: "Wave 1 dispatched: do-architect, do-coder"
+
+**DO NOT:**
+- Read file contents to paste into agent prompts (agents can read themselves)
+- Carry full agent results in orchestrator context
+- Re-read large files between waves
+- Write detailed BUILD.md with full agent outputs inline
+
+### File Permissions
+
+Subagents CANNOT prompt for permissions — they fail silently if denied.
+
+**Before dispatching agents that write files:**
+1. List ALL absolute paths agents will write to
+2. If any path is **outside the current project directory**, tell the user and get approval FIRST
+3. If the user's permission mode requires approval, the agent prompts will show the paths —
+   but if an agent silently fails, surface it immediately
+
+**No silent retries. No falling back to doing it yourself.**
 
 ### Handling Agent Failures
 
@@ -66,15 +102,14 @@ Use AskUserQuestion:
   - "Debug" - dispatch do-debugger to investigate
   - "Stop" - save state and stop
 
-**CRITICAL: Do NOT silently fall back to doing the agent's work yourself.** If an agent fails,
-the user must know. The orchestrator does not write application code — ever. If retries fail,
-ask the user to intervene.
+**NEVER fall back to doing the agent's work yourself.** The orchestrator does not write
+application code — ever.
 
 ### Git After Each Wave
 
 If code was modified and `git.conventional_commits` is true in config:
 
-1. Generate a conventional commit message from the wave's task descriptions and changed files
+1. Generate a conventional commit message from the wave's task descriptions
 2. Stage specific files changed during this wave (never `git add .`)
 3. Commit automatically - do not prompt
 
@@ -82,11 +117,12 @@ If `git.conventional_commits` is false or absent, skip the commit step entirely.
 
 ## 3. Compile Results
 
-Write `BUILD.md` in the phase directory with:
-- Execution log per wave
-- Decisions made by agents
-- Issues encountered
-- Files modified (complete list)
+Write a brief `BUILD.md` in the phase directory with:
+- Wave execution log (1-2 lines per wave)
+- Files modified (list of paths)
+- Issues encountered (if any)
+
+**Keep BUILD.md concise.** Don't dump full agent outputs into it.
 
 ## 4. Update State
 

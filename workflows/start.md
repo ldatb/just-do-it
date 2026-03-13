@@ -69,12 +69,51 @@ Check if `.work/` directory exists AND `.work/config.json` exists.
 Auto-create first phase: `.work/phases/01-<name>/` derived from the work description. No prompt.
 
 **If phases exist:**
-Read STATE.md. Find the next incomplete phase and auto-select it.
+Read STATE.md. Assess the state of all phases.
 
-If the next phase is genuinely ambiguous (e.g. multiple incomplete phases in non-obvious order),
-use AskUserQuestion to ask which phase to continue. Otherwise skip the prompt.
+### 2a. Present Status and Ask What to Do
 
-Create the phase directory:
+First, give the user a clear picture of where things stand:
+- **Previous phase**: name, status (complete/in-progress/needs-verify), any uncommitted changes
+- **Next phase**: name, what it will accomplish
+- **Loose ends**: uncommitted git changes, unmerged branches, unverified work
+
+Then use AskUserQuestion to let the user decide what to do:
+
+Use AskUserQuestion:
+- header: "Phase Navigation"
+- question: "[Status summary — e.g., 'Phase 1 (admin-api) is built but has uncommitted changes. Phase 2 (backoffice-app) is next.'] What would you like to do?"
+- options:
+  - "Start phase [N]" - proceed to next phase (research → plan → build → verify)
+  - "Review previous work" - review what was built in the last phase before moving on
+  - "Verify previous phase" - run /do:verify on the last phase
+  - "Commit and continue" - commit pending changes, then start next phase
+  - "Rework previous phase" - go back and modify the last phase
+  - "Stop" - save state and exit
+
+**Adapt the options to context.** Don't show "Commit and continue" if there are no uncommitted
+changes. Don't show "Verify" if already verified. Only show options that make sense for the
+current state.
+
+### 2b. Execute User's Choice
+
+Based on the user's selection:
+- **Start phase N**: proceed to step 2c
+- **Review**: show BUILD.md and key files from previous phase, then re-ask
+- **Verify**: run the verify workflow on previous phase, then re-ask
+- **Commit and continue**: commit changes, then proceed to step 2c
+- **Rework**: re-enter the previous phase's build step
+- **Stop**: save STATE.md and exit
+
+### 2c. Confirm Next Phase
+
+Present the next phase summary:
+- **Phase**: number and name
+- **Goal**: what this phase will accomplish (from STATE.md or $ARGUMENTS)
+- **Prerequisites**: what's already done that this phase builds on
+- **Pipeline**: research → plan → build → verify
+
+Create the phase directory if it doesn't exist:
 ```
 .work/phases/XX-<name>/
 ```
@@ -231,30 +270,23 @@ THEN use AskUserQuestion:
 
 ## 6. Build
 
-Read PLAN.md. For each wave:
+**Follow the build workflow in `build.md` exactly.** The key principles:
 
-1. Resolve model for each task's agent from config.json
-2. **Use the Agent tool** to dispatch agents in parallel (respecting `max_concurrent` from config)
-3. Each agent reads context files + PLAN.md for its task, executes, reports back
-4. Compile results into `BUILD.md`
-5. Update STATE.md
-6. Proceed to next wave automatically
+1. **Pass file PATHS to agents, not file CONTENTS** — each agent gets a fresh 200k context window
+2. **Use the Agent tool** to dispatch agents in parallel (respecting `max_concurrent`)
+3. Agents write their results to `.work/phases/XX/agent-results/<agent>.md`
+4. Keep orchestrator context lean — don't carry full agent outputs
+5. Brief status updates per wave
 
-**CRITICAL: "Dispatch agents" means use the Agent tool with the correct `subagent_type` (e.g., `do-coder`, `do-architect`, `do-security`).
-You are an orchestrator. You do NOT write code yourself. You launch specialist agent subprocesses
-and compile their results. The ONLY exception is trivial orchestration tasks like writing BUILD.md or STATE.md.**
+**CRITICAL: You are a LEAN orchestrator. Do NOT read file contents to paste into prompts.
+Do NOT carry agent results in your context. Do NOT write application code yourself.
+If an agent fails, ask the user — NEVER fall back to doing it yourself.**
 
-### File Permissions for Agents
+### File Permissions
 
-Subagents CANNOT prompt for permissions — they fail silently if denied.
-
-1. **Use absolute paths** in agent prompts — list every file the agent will create or modify
-2. **If agents write outside the project directory**, tell the user which paths will be touched
-   and let them approve before dispatching
-3. **If an agent fails due to permissions**, surface it to the user — do NOT silently retry
-   or do the work yourself
-
-**NEVER fall back to doing the agent's work yourself.** If an agent fails, ask the user.
+Before dispatching agents, list ALL absolute file paths they will write to.
+If any are outside the project directory, tell the user and get approval FIRST.
+Subagents CANNOT prompt for permissions — they fail silently.
 
 No per-wave confirmation prompt.
 
