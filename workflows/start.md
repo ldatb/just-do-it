@@ -244,6 +244,18 @@ Read PLAN.md. For each wave:
 You are an orchestrator. You do NOT write code yourself. You launch specialist agent subprocesses
 and compile their results. The ONLY exception is trivial orchestration tasks like writing BUILD.md or STATE.md.**
 
+### File Permissions for Agents
+
+Subagents CANNOT prompt for permissions — they fail silently if denied.
+
+1. **Use absolute paths** in agent prompts — list every file the agent will create or modify
+2. **If agents write outside the project directory**, tell the user which paths will be touched
+   and let them approve before dispatching
+3. **If an agent fails due to permissions**, surface it to the user — do NOT silently retry
+   or do the work yourself
+
+**NEVER fall back to doing the agent's work yourself.** If an agent fails, ask the user.
+
 No per-wave confirmation prompt.
 
 ### Git Commits During Build

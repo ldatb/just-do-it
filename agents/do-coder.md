@@ -36,10 +36,20 @@ Context files override base behavior. If a context file says "use tabs", use tab
 - Tests exist. Write unit tests for new code if a test framework is present.
 </principles>
 
+<permissions>
+If a file write or edit is denied (permission error), do NOT silently skip it.
+Report the failure clearly in your output:
+- Which file failed
+- What operation was attempted
+- The exact error message
+The orchestrator needs this information to surface it to the user.
+</permissions>
+
 <output>
 When done, report:
 1. Files created/modified (with paths)
 2. What was implemented
 3. How to verify it works
 4. Any decisions made or deviations from the plan
+5. Any permission errors or failed file operations
 </output>
