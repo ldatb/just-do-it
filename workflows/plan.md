@@ -1,6 +1,8 @@
 <purpose>
 Plan the current or specified phase. Creates PLAN.md with tasks, waves, agent assignments, and success criteria.
 The plan MUST include all relevant agents - not just do-coder. Use the agent dispatch rules below.
+
+Before finalizing, ask the user about key implementation decisions that affect the plan.
 </purpose>
 
 <process>
@@ -17,9 +19,9 @@ The plan MUST include all relevant agents - not just do-coder. Use the agent dis
 ## 2. Read Phase Context
 
 Read the phase directory `.work/phases/XX-<name>/`:
-- `RESEARCH.md` if it exists (research findings)
+- `RESEARCH.md` if it exists (research findings + user decisions from research phase)
 - `BRAINSTORM.md` if it exists (brainstorm output)
-If no research exists, do a quick research pass first (dispatch `do-researcher`).
+If no research exists, do a quick research pass first (use **Agent tool** to dispatch `do-researcher`).
 
 ## 3. Classify Work and Select Agents
 
@@ -95,15 +97,45 @@ Wave 2 (Build):      do-coder, do-security (parallel)
 Wave 3 (Verify):     do-qa, do-reviewer, do-security, do-reliability
 ```
 
-## 5. Create PLAN.md
+## 5. Ask About Implementation Decisions (MANDATORY unless fast_mode)
 
-Write `PLAN.md` in the phase directory:
+**Before writing PLAN.md, identify implementation-level decisions the user should weigh in on.**
+
+Read `fast_mode` from config.json.
+
+**If fast_mode is true:** Skip this step — make reasonable default decisions and note them in the plan.
+
+**If fast_mode is false:** Think ahead of the user. Identify decisions that:
+- Affect the architecture or structure of what's being built
+- Have meaningful tradeoffs (not obvious best-answer questions)
+- The user would want to know about before you start building
+
+Examples:
+- "Should the API use REST or GraphQL?"
+- "Do you want pagination or infinite scroll for the list?"
+- "Should we split this into 2 phases or do it all at once?"
+- "The component needs state management — use stores, context, or props drilling?"
+- "Do you want tests alongside the code or in a separate directory?"
+
+For each decision, use AskUserQuestion:
+- header: "Planning: [Decision Topic]"
+- question: "[Clear question with your recommendation and why]"
+- options: [2-4 concrete options with tradeoff notes]
+
+Keep to 2-4 decision questions max. Don't ask about things already decided in research.
+
+## 6. Create PLAN.md
+
+Write `PLAN.md` in the phase directory, incorporating user decisions from steps 4b and 5:
 
 ```markdown
 # Plan: [Phase Name]
 
 ## Goal
 [One sentence]
+
+## Decisions
+[Key decisions made by the user during research and planning, with rationale]
 
 ## Agents
 - Build: [list of agents for build waves]
@@ -130,19 +162,30 @@ Write `PLAN.md` in the phase directory:
 [How we know the phase is complete]
 ```
 
-## 6. Present Plan
+## 7. Present Plan (MANDATORY - do not skip)
 
-Show the plan to the user. This is a mandatory approval gate.
+**You MUST explain the plan to the user before asking for approval.**
 
-Use AskUserQuestion:
+Print a clear summary that includes:
+- **Goal**: What this phase achieves
+- **Decisions**: What the user chose and how it shapes the plan
+- **Approach**: Key technical/design decisions and rationale
+- **Agents**: Which specialists will be dispatched and why each is needed
+- **Waves**: Execution order with what each wave does
+- **Key files**: What will be created or modified
+
+The user should understand the plan well enough to give informed approval.
+Do NOT just write PLAN.md silently and ask "Go?". EXPLAIN it.
+
+Then use AskUserQuestion:
 - header: "Plan"
-- question: "Plan ready. [N] agents across [M] waves. Build it?"
+- question: "Ready to build?"
 - options:
   - "Go" - start execution
   - "Adjust" - modify the plan
   - "Stop" - save and exit
 
-## 7. Update State
+## 8. Update State
 
 Update STATE.md:
 - Step: plan

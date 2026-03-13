@@ -44,7 +44,7 @@ Announce which specialists will be dispatched, then proceed immediately.
 
 Resolve model for each specialist from config.json model_overrides or the active profile.
 
-Dispatch all selected specialists in parallel. Each specialist:
+**Use the Agent tool** to dispatch all selected specialists in parallel. Each specialist:
 1. Reads project context files (.work/context/)
 2. Reads the phase plan and build log
 3. Reviews relevant files from their domain perspective

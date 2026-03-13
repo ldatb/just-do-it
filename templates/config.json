@@ -1,7 +1,6 @@
 {
   "model_profile": "balanced",
   "model_overrides": {},
-  "mode": "interactive",
   "fast_mode": false,
   "agents": {
     "coder": true,

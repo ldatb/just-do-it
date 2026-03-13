@@ -17,8 +17,35 @@ Discovery generates:
 
 ## 1. Pre-flight
 
-Check if `.work/` exists. If not, create it with default config.
+Check if `.work/` exists. If not, create it.
 Create `.work/context/` directory.
+
+**If `.work/config.json` does not exist:**
+Copy the config template from the plugin's `templates/config.json`. This ensures ALL required
+fields exist with defaults. The template schema is the single source of truth for config structure.
+
+**If `.work/config.json` exists:**
+Validate it has all required fields from the template. If fields are missing, merge them in
+with template defaults (don't overwrite existing values).
+
+**Required config.json structure (from template):**
+```json
+{
+  "model_profile": "balanced",
+  "model_overrides": {},
+  "fast_mode": false,
+  "agents": { "<agent_name>": true/false },
+  "parallelization": { "enabled": true, "max_concurrent": 4 },
+  "git": {
+    "auto_commit": false,
+    "use_branches": true,
+    "conventional_commits": true
+  }
+}
+```
+
+**CRITICAL: Always use this exact structure. Do NOT invent new fields like `disabled_agents`,
+`git.mode`, `git.commit_style`, or put `max_concurrent` at root level. The template is the schema.**
 
 **If `.work/context/` already has files (re-discovery):**
 - Back up existing context to `.work/context/.backup/` (timestamped)
@@ -27,7 +54,9 @@ Create `.work/context/` directory.
 
 ## 2. Dispatch Discovery Agents (Parallel)
 
-Launch up to 6 research agents in parallel. Each agent MUST read the codebase deeply - not just skim file names.
+**Use the Agent tool** to launch up to 6 `do-researcher` agents in parallel. Each agent MUST read the codebase deeply - not just skim file names.
+
+**CRITICAL: You are an orchestrator. You do NOT analyze the codebase yourself. You dispatch agents and compile their results.**
 
 ### Agent 1: Stack & Structure
 Analyze the codebase for:
@@ -256,10 +285,25 @@ Create `.work/HEALTH.md`:
 
 ## 5. Generate Recommended Config
 
-Update `.work/config.json` with project-specific recommendations:
-- Disable agents that are irrelevant (e.g., `do-data: false` if no database, `do-migrator: false` if no migrations)
-- Suggest model overrides for critical agents (e.g., if complex security setup, suggest `security: opus`)
-- Set git conventions based on what was found in history
+Read the current `.work/config.json`. Ensure it follows the template schema exactly.
+
+Recommend project-specific changes based on discovery findings:
+- Set `agents.<name>` to `false` for irrelevant agents (e.g., `agents.data: false` if no database)
+- Add `model_overrides` for critical agents (e.g., `"security": "opus"` if complex security setup)
+- Set `git.conventional_commits` based on what was found in history
+- Set `git.use_branches` based on current git workflow
+
+**CRITICAL: Only modify values within the existing template structure. Do NOT add new top-level
+fields, rename fields, or restructure. The config schema is:**
+- `model_profile` — string
+- `model_overrides` — object of agent:model pairs
+- `fast_mode` — boolean
+- `agents` — object of agent_name:boolean pairs (use template agent names exactly)
+- `parallelization.enabled` — boolean
+- `parallelization.max_concurrent` — number
+- `git.auto_commit` — boolean
+- `git.use_branches` — boolean
+- `git.conventional_commits` — boolean
 
 Do NOT auto-apply. Show recommendations and ask user:
 

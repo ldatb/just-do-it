@@ -1,6 +1,9 @@
 <purpose>
 Execute the current or specified phase's plan. Dispatches specialist agents per task in wave order.
-Config drives decisions - read settings and act. Do not prompt unless a task fails.
+The plan is already approved — just execute it. Only ask on task failure.
+
+**You are an orchestrator.** Use the Agent tool to dispatch specialist agents.
+Do NOT write application code yourself.
 </purpose>
 
 <process>
@@ -28,10 +31,16 @@ For each wave in PLAN.md:
      - Phase plan (PLAN.md path)
      - Specific task details
      - Files to read/modify
-3. Dispatch all wave tasks in parallel (up to `max_concurrent`)
+3. **Use the Agent tool** to dispatch all wave tasks in parallel (up to `max_concurrent`)
 4. Collect results from all agents
 5. Update BUILD.md with results
 6. Update STATE.md with wave progress
+7. Brief status update to user: "Wave N complete. [summary of what was done]."
+
+**CRITICAL: "Dispatch" means use the Agent tool with the correct `subagent_type` (e.g., `do-coder`, `do-architect`, `do-security`).
+You are an orchestrator. You do NOT write application code yourself. You launch specialist agent subprocesses.**
+
+**No decision questions during build.** The plan was already approved. Just execute it.
 
 **If any task fails:**
 

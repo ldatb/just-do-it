@@ -36,7 +36,7 @@ If $ARGUMENTS is specific enough, skip the prompt and proceed.
 
 Resolve model for `do-debugger` from config (or use balanced default).
 
-Dispatch `do-debugger` agent with:
+**Use the Agent tool** to dispatch `do-debugger` agent with:
 - The bug description from $ARGUMENTS
 - Project context files (if available)
 - Engineering context (if available)

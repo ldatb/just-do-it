@@ -28,7 +28,7 @@ No confirmation prompt. Just create it.
 
 ## 3. Quick Research (30 seconds max)
 
-Dispatch a single `do-researcher` agent with a focused prompt:
+**Use the Agent tool** to dispatch a single `do-researcher` agent with a focused prompt:
 - "What are the top 2-3 things I need to know before implementing: $ARGUMENTS"
 - Keep it brief. No deep dives.
 
@@ -48,7 +48,7 @@ Show the plan as a brief summary in output. Do NOT ask for approval. Proceed imm
 ## 5. Build (Single Wave)
 
 1. Resolve models from config.json
-2. Dispatch all task agents in parallel (respecting max_concurrent)
+2. **Use the Agent tool** to dispatch all task agents in parallel (respecting max_concurrent)
 3. Compile results into `BUILD.md`
 
 After build, if code was modified and git is configured:
@@ -58,7 +58,7 @@ After build, if code was modified and git is configured:
 
 ## 6. Quick Verify
 
-Dispatch only `do-qa` + `do-reviewer` (2 agents, parallel).
+**Use the Agent tool** to dispatch only `do-qa` + `do-reviewer` (2 agents, parallel).
 
 **If CRITICAL findings:**
 Use AskUserQuestion:

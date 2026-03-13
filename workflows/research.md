@@ -1,7 +1,7 @@
 <purpose>
-Standalone research on a topic, technology, or approach. Dispatches do-researcher agents
-and produces RESEARCH.md. Can run independently or feed into /do:plan.
-Config-driven: dispatches based on fast_mode setting, no unnecessary prompts.
+Standalone research on a topic, technology, or approach. Dispatches do-researcher agents,
+presents findings with tradeoffs, asks the user about key decisions, and produces RESEARCH.md.
+Can run independently or feed into /do:plan.
 </purpose>
 
 <process>
@@ -15,6 +15,8 @@ Config-driven: dispatches based on fast_mode setting, no unnecessary prompts.
    - Otherwise: write to `.work/` root
 
 ## 2. Dispatch Researchers
+
+**Use the Agent tool** to dispatch `do-researcher` agents. You do NOT research yourself.
 
 Resolve model for `do-researcher` from config.
 
@@ -59,11 +61,46 @@ Compile all agent outputs into `RESEARCH.md`:
 
 ## Recommendation
 [Clear next step with rationale]
+
+## Decisions
+[Filled in after user input in step 4]
 ```
 
-## 4. Present Results
+## 4. Present Findings and Ask for Decisions (MANDATORY)
 
-Show the user a brief summary of findings. No prompt needed - research is complete.
+**You MUST present research findings to the user and ask about key decisions. Do NOT silently
+write RESEARCH.md and move on.**
+
+After compiling findings, analyze them and identify:
+
+1. **Decisions that need user input** — which library, which approach, which pattern
+2. **Tradeoffs the user should understand** — "A is faster but B is more flexible"
+3. **Things the user hasn't thought about** — risks, hidden dependencies, constraints, edge cases
+
+**Think ahead of the user.** Surface decisions they don't know they need to make. Examples:
+- "This requires choosing between X and Y — X is simpler but Y scales better"
+- "The library you mentioned is deprecated. Here are 3 alternatives."
+- "This approach will also require Z, which isn't in scope yet — add it now or defer?"
+- "There's a compatibility issue between A and B that will affect your choice"
+
+### Format:
+
+1. **Print a research summary** (3-5 bullets with key findings and tradeoffs)
+
+2. **For each decision point**, use AskUserQuestion:
+   - header: "Research: [Decision Topic]"
+   - question: "[Clear question explaining why this matters and your recommendation]"
+   - options: [2-4 concrete options, each with a brief tradeoff note]
+
+3. **Give your recommendation** with each question — don't just list options neutrally.
+   Say "I recommend X because..." but let the user choose.
+
+### Rules:
+- Keep decision questions to 2-4 max per research session
+- Don't ask about things config already answers
+- Only ask about decisions that genuinely affect the outcome
+- Always include a recommended option
+- After getting answers, save decisions to RESEARCH.md under `## Decisions`
 
 ## 5. Update State
 
