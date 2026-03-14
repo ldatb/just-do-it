@@ -1,0 +1,148 @@
+# Intelligence
+
+Four feedback mechanisms that make the system smarter over time without adding complexity.
+
+## 1. Self-Learning Loop
+
+After every verify phase, record what worked and what didn't in `.work/learnings.json`.
+
+### Format
+
+```json
+{
+  "entries": [
+    {
+      "date": "2026-03-14",
+      "phase": "01-add-oauth",
+      "domain": "engineering",
+      "task_type": "auth",
+      "agents_used": ["do-architect", "do-coder", "do-security"],
+      "model_profile": "balanced",
+      "outcome": "pass",
+      "notes": "security agent caught token storage issue in build, saved a verify round"
+    }
+  ]
+}
+```
+
+### Fields
+
+| Field | Values | Purpose |
+| ----- | ------ | ------- |
+| outcome | `pass` / `pass_with_fixes` / `fail` | Did verify pass on first try? |
+| task_type | Free text (auth, api, migration, refactor, ui, docs, etc.) | Match similar future tasks |
+| notes | One sentence | What worked or what went wrong |
+
+### How Plan Uses Learnings
+
+During agent selection (plan step 3), read `.work/learnings.json` if it exists. Look for entries with matching `task_type` or `domain`. If a pattern emerges:
+
+- An agent consistently catches issues early → promote it to an earlier wave
+- An agent never finds issues for this task type → consider skipping in fast_mode
+- A model profile produced failures → suggest upgrading for similar work
+
+Don't over-optimize. 3+ matching entries = a pattern. Fewer = ignore.
+
+## 2. Cost-Aware Routing
+
+Not every task needs the full agent roster. Classify task complexity before selecting agents.
+
+### Complexity Levels
+
+| Level | Criteria | Agent Strategy |
+| ----- | -------- | -------------- |
+| **trivial** | Single file, < 50 lines changed, no new dependencies, no security surface | `do-coder` only. Skip verify agents — run linter/tests directly. |
+| **simple** | 1-3 files, single concern, no architecture decisions | `do-coder` + `do-qa` + `do-reviewer`. Skip design wave. |
+| **standard** | Multi-file, may involve architecture or security | Full dispatch per agent-roster.md rules. |
+| **complex** | Cross-cutting, multiple domains, new system boundaries | Full dispatch + consider quality model profile. |
+
+### Classification Rules
+
+Read the phase goal and PLAN.md context. Assign complexity based on:
+
+1. **File count** — how many files will change?
+2. **Scope** — single concern or cross-cutting?
+3. **Risk surface** — does it touch auth, data, money, or external systems?
+4. **Novelty** — new pattern or following established pattern?
+
+If any risk surface exists, complexity is at least **standard** regardless of file count.
+
+### Fast Mode Interaction
+
+`fast_mode: true` reduces ceremony but does NOT reduce complexity classification. A complex task in fast mode still gets full agent dispatch — it just skips decision questions.
+
+## 3. Anti-Drift Checkpoints
+
+In multi-wave builds (3+ waves), agents in later waves can drift from the plan — especially if earlier waves produced unexpected output.
+
+### Checkpoint Rule
+
+**After every 2 build waves**, the orchestrator pauses and:
+
+1. Read the outputs from completed waves (agent-results files)
+2. Compare against PLAN.md goals and success criteria
+3. Check: are we still on track?
+
+### Possible Outcomes
+
+| Result | Action |
+| ------ | ------ |
+| On track | Continue to next wave. Log "Checkpoint: on track." |
+| Minor drift | Note the drift, adjust next wave's agent prompts to correct. Log adjustment. |
+| Major drift | Stop. Tell the user what drifted and why. Ask: Continue / Re-plan / Stop. |
+
+### What Counts as Drift
+
+- Files modified that aren't in the plan
+- Architecture decisions made that contradict plan decisions
+- Success criteria that can no longer be met given current output
+- Agents producing work outside their assigned scope
+
+### Single-Wave and Two-Wave Builds
+
+No checkpoint needed. The verify phase catches issues for short builds.
+
+## 4. Consensus Verification
+
+When multiple verify agents review the same code, they may disagree on severity. This wastes the user's time if every disagreement escalates.
+
+### Tiebreaker Rules
+
+**Same finding, different severity:**
+
+| Scenario | Resolution |
+| -------- | ---------- |
+| Domain expert rates higher than generalist | Use domain expert's rating. `do-security` outranks `do-reviewer` on security findings. |
+| Domain expert rates lower than generalist | Use domain expert's rating. They have more context. |
+| Two domain experts disagree | Use the higher severity. Err on the side of caution. |
+| Only generalists disagree | Use the lower severity. |
+
+**Domain expertise hierarchy for tiebreaking:**
+
+| Finding Category | Domain Expert | Generalists |
+| ---------------- | ------------- | ----------- |
+| Security | `do-security` | `do-reviewer`, `do-qa` |
+| Performance | `do-perf` | `do-reviewer`, `do-qa` |
+| Reliability | `do-reliability` | `do-reviewer`, `do-qa` |
+| Infrastructure | `do-devops` | `do-reviewer`, `do-qa` |
+| Compliance | `do-compliance` | `do-reviewer`, `do-qa` |
+| Code quality | `do-reviewer` | `do-qa` |
+| Test coverage | `do-qa` | `do-reviewer` |
+
+### Deduplication
+
+Before writing VERIFY.md, merge findings that describe the same issue:
+1. Group findings by file + line range (within 5 lines = same location)
+2. If same location + same category → merge into one finding
+3. Apply tiebreaker rules for severity
+4. Credit all agents that found it
+
+### VERIFY.md Additions
+
+When consensus was applied, note it:
+
+```markdown
+### Finding 3: SQL injection in user query (CRITICAL)
+- **Found by:** do-security (CRITICAL), do-reviewer (HIGH)
+- **Consensus:** CRITICAL — domain expert (do-security) rating applied
+```

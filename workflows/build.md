@@ -63,6 +63,20 @@ Subagents CANNOT prompt for permissions — they fail silently.
 Before dispatch: list ALL absolute paths agents will write.
 If any path is outside the project directory, tell user and get approval FIRST.
 
+### Anti-Drift Checkpoints
+
+For builds with 3+ waves: after every 2 completed waves, pause and check alignment per `references/intelligence.md` § Anti-Drift Checkpoints.
+
+1. Read agent-results from completed waves
+2. Compare against PLAN.md goals and success criteria
+3. Assess: on track / minor drift / major drift
+
+- **On track:** Continue. Log "Checkpoint: on track."
+- **Minor drift:** Adjust next wave's agent prompts to correct. Log adjustment in BUILD.md.
+- **Major drift:** Stop. Tell user what drifted. Use AskUserQuestion: Continue / Re-plan / Stop.
+
+Builds with 1-2 waves skip checkpoints — verify catches issues for short builds.
+
 ### Failures
 
 If a task fails, use AskUserQuestion: Retry / Skip / Debug / Stop.

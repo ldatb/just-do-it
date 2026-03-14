@@ -27,7 +27,30 @@ If no research exists, do a quick research pass first (use **Agent tool** to dis
 
 **This step is critical. Plans that only dispatch do-coder produce incomplete work.**
 
-### Step 3a: Classify the work domain
+### Step 3a: Classify complexity (cost-aware routing)
+
+Before selecting agents, classify the task complexity per `references/intelligence.md` § Cost-Aware Routing:
+
+- **trivial** (single file, <50 lines, no risk surface) → `do-coder` only, skip verify agents
+- **simple** (1-3 files, single concern) → `do-coder` + `do-qa` + `do-reviewer`, skip design wave
+- **standard** (multi-file, may involve architecture/security) → full dispatch
+- **complex** (cross-cutting, multiple domains) → full dispatch + consider quality profile
+
+Any risk surface (auth, data, money, external systems) = at least **standard**.
+
+Note the complexity level in PLAN.md header. If trivial or simple, skip the steps below that don't apply.
+
+### Step 3b: Consult learnings
+
+If `.work/learnings.json` exists, read it. Look for entries with matching `task_type` or `domain` (3+ matches = a pattern):
+
+- Agent that consistently catches issues early → promote to earlier wave
+- Agent that never finds issues for this task type → skip in fast_mode
+- Model profile that produced failures → suggest upgrade
+
+Note any learnings-based adjustments in PLAN.md under `## Decisions`.
+
+### Step 3c: Classify the work domain
 
 Read the phase goal and categorize:
 - **Engineering** - code changes, architecture, infrastructure
@@ -36,7 +59,7 @@ Read the phase goal and categorize:
 - **Product** - product decisions, design
 - **Mixed** - spans multiple domains
 
-### Step 3b: Select agents using dispatch rules
+### Step 3d: Select agents using dispatch rules
 
 For EACH phase of execution (Build, then Verify), determine which agents run.
 
@@ -129,6 +152,9 @@ Write `PLAN.md` in the phase directory, incorporating user decisions from steps 
 
 ## Goal
 [One sentence]
+
+## Complexity
+[trivial / simple / standard / complex] — [one-line justification]
 
 ## Decisions
 [Key decisions made by the user during research and planning, with rationale]

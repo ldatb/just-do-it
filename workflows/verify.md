@@ -30,18 +30,45 @@ Announce specialists, then dispatch immediately.
 
 Dispatch all specialists via Agent tool in parallel. Each reads project context, phase plan, and build log, then reviews from their domain perspective.
 
-## 4. Report
+## 4. Consensus & Deduplication
+
+Before writing the report, apply consensus rules per `references/intelligence.md` § Consensus Verification:
+
+1. **Deduplicate:** Group findings by file + line range (within 5 lines = same location). Same location + same category = merge into one finding.
+2. **Tiebreak severity:** When agents disagree on severity, domain expert outranks generalist. Two domain experts disagree → use higher severity. Only generalists disagree → use lower severity.
+3. **Credit all agents** that found a merged issue.
+
+## 5. Report
 
 Write VERIFY.md with:
 - Overall status (PASS only if all pass)
-- Each specialist's findings: status (PASS/FAIL/WARN), findings by severity (CRITICAL/HIGH/MEDIUM/LOW), verdict
+- Each finding with: severity, description, agents that found it, consensus note (if tiebreaker applied)
 - Action items for CRITICAL/HIGH findings
 
-## 5. Act
+## 6. Act
 
 **CRITICAL findings:** Ask user (fix now / show details / fix later / override).
 If override: record warning in VERIFY.md with date.
 
-**All PASS:** Print "Phase verified." Update STATE.md. Stop.
+**All PASS:** Print "Phase verified." Update STATE.md.
+
+## 7. Record Learnings
+
+After every verify (pass or fail), append an entry to `.work/learnings.json` per `references/intelligence.md` § Self-Learning Loop:
+
+```json
+{
+  "date": "ISO date",
+  "phase": "phase name",
+  "domain": "engineering|business|people|product",
+  "task_type": "auth|api|migration|refactor|ui|docs|etc",
+  "agents_used": ["list of agents dispatched"],
+  "model_profile": "from config",
+  "outcome": "pass|pass_with_fixes|fail",
+  "notes": "one sentence — what worked or what went wrong"
+}
+```
+
+If `.work/learnings.json` doesn't exist, create it with `{"entries": []}`. Append to the `entries` array — never overwrite.
 
 </process>
