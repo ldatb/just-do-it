@@ -18,7 +18,6 @@ project-specific context files that customize agent behavior.
 
 <execution_context>
 @workflows/setup.md
-@references/context-layering.md
 @references/agent-roster.md
 </execution_context>
 

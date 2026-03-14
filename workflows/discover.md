@@ -34,8 +34,7 @@ with template defaults (don't overwrite existing values).
   "model_profile": "balanced",
   "model_overrides": {},
   "fast_mode": false,
-  "agents": { "<agent_name>": true/false },
-  "parallelization": { "enabled": true, "max_concurrent": 4 },
+  "parallelization": { "max_concurrent": 4 },
   "git": {
     "auto_commit": false,
     "use_branches": true,
@@ -288,18 +287,16 @@ Create `.work/HEALTH.md`:
 Read the current `.work/config.json`. Ensure it follows the template schema exactly.
 
 Recommend project-specific changes based on discovery findings:
-- Set `agents.<name>` to `false` for irrelevant agents (e.g., `agents.data: false` if no database)
 - Add `model_overrides` for critical agents (e.g., `"security": "opus"` if complex security setup)
 - Set `git.conventional_commits` based on what was found in history
 - Set `git.use_branches` based on current git workflow
+- Adjust `parallelization.max_concurrent` if needed
 
 **CRITICAL: Only modify values within the existing template structure. Do NOT add new top-level
 fields, rename fields, or restructure. The config schema is:**
 - `model_profile` — string
 - `model_overrides` — object of agent:model pairs
 - `fast_mode` — boolean
-- `agents` — object of agent_name:boolean pairs (use template agent names exactly)
-- `parallelization.enabled` — boolean
 - `parallelization.max_concurrent` — number
 - `git.auto_commit` — boolean
 - `git.use_branches` — boolean

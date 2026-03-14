@@ -1,97 +1,48 @@
 <purpose>
-View or modify project configuration. Always interactive - uses selectable options.
+View or modify project configuration.
 </purpose>
 
 <process>
 
-## 1. Load Config
+## 1. Load
 
-Read `.work/config.json`.
+Read `.work/config.json`. If `.work/` doesn't exist: error — no project initialized.
 
-**If `.work/` doesn't exist:** Error - no project initialized.
+## 2. Menu
 
-## 2. Parse Arguments
-
-If $ARGUMENTS is empty: display current settings in a formatted view, then prompt.
+If $ARGUMENTS is empty: display current settings, then prompt.
 
 Use AskUserQuestion:
 - header: "Settings"
 - question: "What would you like to change?"
 - options:
-  - "Model profile" - change quality/balanced/budget
-  - "Fast mode" - toggle fast mode on/off
+  - "Model profile" - quality/balanced/budget
+  - "Fast mode" - on/off
   - "Git workflow" - branches, commits, auto-commit
-  - "Agents" - enable/disable specific agents
-  - "Parallelization" - adjust max concurrent agents
-  - "View all" - show current config.json
-  - "Done" - exit settings
+  - "Parallelization" - max concurrent agents
+  - "View all" - show config.json
+  - "Done" - exit
 
 ## 3. Handle Selection
 
 ### Model Profile
-
-Use AskUserQuestion:
-- header: "Model Profile"
-- question: "Current: [current]. Select new profile:"
-- options:
-  - "quality" - opus for critical agents, highest cost
-  - "balanced" - sonnet for most, reasonable cost
-  - "budget" - haiku for most, lowest cost
+Options: quality (opus for critical agents) / balanced (sonnet, default) / budget (haiku)
 
 ### Fast Mode
-
-Use AskUserQuestion:
-- header: "Fast Mode"
-- question: "Current: [on/off]. Fast mode reduces ceremony - shorter research, quick verify."
-- options:
-  - "On" - enable fast mode
-  - "Off" - disable fast mode
+Toggle on/off. Fast mode: shorter research, quick verify, less ceremony.
 
 ### Git Workflow
-
-Use AskUserQuestion:
-- header: "Git Workflow"
-- question: "Current git settings: [summary]"
-- options:
-  - "Branches + conventional commits" - full git workflow
-  - "Commits only" - no branches, just conventional commits
-  - "No git" - don't touch git
-  - "Toggle auto-commit" - auto-commit planning docs
-
-### Agents
-
-Show current agent status (enabled/disabled).
-
-Use AskUserQuestion:
-- header: "Toggle Agent"
-- question: "Which agent to toggle?"
-- options: [list of all agents with current status]
+Options:
+- "Branches + conventional commits" (full)
+- "Commits only" (no branches)
+- "No git" (hands off)
+- "Toggle auto-commit" (auto-commit after each wave)
 
 ### Parallelization
+Options: 2 (conservative) / 4 (default) / 6 (aggressive) / 8 (maximum)
 
-Use AskUserQuestion:
-- header: "Max Concurrent Agents"
-- question: "Current: [N]. How many agents in parallel?"
-- options:
-  - "2" - conservative
-  - "4" - default
-  - "6" - aggressive
-  - "8" - maximum
+## 4. Apply
 
-## 4. Apply Changes
-
-Update `.work/config.json` with the new value.
-Update `.work/capabilities.md` if relevant.
-
-## 5. Confirm
-
-Show the updated setting to the user.
-
-Use AskUserQuestion:
-- header: "Settings Updated"
-- question: "Change more settings?"
-- options:
-  - "Yes" - back to settings menu
-  - "Done" - exit settings
+Update config.json. Show updated setting. Ask if more changes or done.
 
 </process>

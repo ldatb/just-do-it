@@ -74,10 +74,6 @@ For EACH phase of execution (Build, then Verify), determine which agents run.
 
 **Fast mode**: Verify uses only `do-qa` + `do-reviewer` (skip conditional agents).
 
-### Step 3c: Check agent availability
-
-Cross-reference selected agents with `config.agents` - only include agents that are enabled (true).
-
 ## 4. Organize into Waves
 
 Group tasks into waves based on dependencies:

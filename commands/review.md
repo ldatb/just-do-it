@@ -19,7 +19,6 @@ Multi-specialist code review of files, PRs, or uncommitted changes.
 @workflows/review.md
 @references/agent-roster.md
 @references/model-profiles.md
-@references/verification-patterns.md
 </execution_context>
 
 <context>

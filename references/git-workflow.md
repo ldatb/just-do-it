@@ -2,153 +2,51 @@
 
 ## Principles
 
-1. **User approves every git action.** No silent commits, no auto-push.
-2. **Conventional commits.** All messages and branches follow the convention.
-3. **Feature branches.** Code work happens on branches, never directly on main.
-4. **No attribution lines.** Never add "Co-Authored-By" or any attribution to commits. Ever.
+1. **Conventional commits.** All messages and branches follow the convention.
+2. **Feature branches.** Code work happens on branches when configured.
+3. **No attribution lines.** Never add "Co-Authored-By" or any attribution. Ever.
+4. **`auto_commit` is the single source of truth.** If true: commit automatically. If false: ask user first.
 
 ## Conventional Commits
 
-Based on https://www.conventionalcommits.org/en/v1.0.0/
+Format: `<type>[optional scope]: <description>`
 
-### Commit Message Format
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-### Types (for commits AND branches)
-| Type | When | Branch Example |
-| ---- | ---- | -------------- |
-| `feat` | New feature or capability | `feat/user-auth` |
+| Type | When | Branch |
+| ---- | ---- | ------ |
+| `feat` | New feature | `feat/user-auth` |
 | `fix` | Bug fix | `fix/login-timeout` |
-| `refactor` | Code restructuring, no behavior change | `refactor/extract-validators` |
-| `docs` | Documentation only | `docs/api-reference` |
-| `test` | Adding or updating tests | `test/payment-flow` |
-| `chore` | Maintenance, config, dependencies | `chore/update-deps` |
-| `perf` | Performance improvement | `perf/query-optimization` |
-| `ci` | CI/CD pipeline changes | `ci/github-actions` |
-| `style` | Formatting, whitespace, no logic change | `style/lint-fixes` |
-| `build` | Build system changes | `build/webpack-config` |
+| `refactor` | Restructuring | `refactor/extract-validators` |
+| `docs` | Documentation | `docs/api-reference` |
+| `test` | Tests | `test/payment-flow` |
+| `chore` | Maintenance | `chore/update-deps` |
+| `perf` | Performance | `perf/query-optimization` |
+| `ci` | CI/CD | `ci/github-actions` |
 
-### Branch Naming
-```
-<type>/<short-kebab-description>
-```
+## Commit Behavior
 
-Examples:
-```
-feat/oauth2-login
-fix/session-race-condition
-refactor/shared-validation
-docs/api-endpoints
-chore/upgrade-to-v3
-```
+Read `git.auto_commit` from config.json:
 
-### Commit Examples
-```
-feat: add JWT authentication to login endpoint
+**If `auto_commit: true`:**
+- Stage specific files (never `git add .`)
+- Generate conventional commit message from the work done
+- Commit. No prompt.
 
-fix: prevent race condition in session refresh
+**If `auto_commit: false`:**
+- Show user: files, proposed message, diff summary
+- Ask via AskUserQuestion: "Commit?" → Yes / Edit message / Skip
+- Only commit if user approves
 
-refactor: extract validation logic into shared module
-
-docs: add API documentation for user endpoints
-
-test: add integration tests for payment flow
-
-chore: update dependencies to latest versions
-
-feat(auth): add password reset flow
-
-fix(api): handle null response from payment gateway
-
-BREAKING CHANGE: rename login endpoint from /auth to /login
-```
-
-### Scoped Commits
-Use scope when the change targets a specific module:
-```
-feat(auth): add two-factor authentication
-fix(payments): handle declined card gracefully
-refactor(users): extract email validation
-```
-
-## Branch Strategy
+## Branches
 
 When `git.use_branches` is true:
+1. Auto-create `<type>/<name>` branch at phase start
+2. All commits go on this branch
+3. On phase completion: merge to main automatically
 
-1. Determine branch type from the work being done
-2. Ask user to confirm branch name via AskUserQuestion
-3. Create branch: `git checkout -b <type>/<name>`
-4. All commits go on this branch
-5. On phase completion, ask user: merge, PR, or leave
+## Push
 
-## Commit Protocol
+Never push automatically. Always ask user first.
 
-**EVERY commit must be approved by the user.** The workflow:
+## Never Commit
 
-1. Stage changes: `git add <specific files>` (never `git add .` or `git add -A`)
-2. Show the user via AskUserQuestion:
-   - Files being committed
-   - The proposed commit message
-   - The diff summary
-3. Options:
-   - "Yes, commit" - proceed
-   - "Edit message" - modify before committing
-   - "Skip" - don't commit now
-4. Only commit if user explicitly approves
-
-## What to Commit
-
-### Always ask before committing:
-- Source code changes
-- Configuration changes
-- Test files
-- Documentation
-
-### Planning docs (`.work/`):
-- Only commit if user approves
-- Ask separately from source code commits
-
-### Never commit:
-- `.env` files or secrets
-- `node_modules`, `__pycache__`, build artifacts
-- Temporary/generated files
-- Files in `.gitignore`
-
-## Push Protocol
-
-Never push automatically. When phase is complete or user requests:
-
-1. Show what will be pushed (branch, commits)
-2. Use AskUserQuestion:
-   - "Yes, push"
-   - "Not now"
-3. Only push if explicitly approved
-
-## Merge Protocol
-
-When merging back to main:
-
-Use AskUserQuestion:
-- header: "Merge Branch"
-- question: "Merge <branch> into main?"
-- options:
-  - "Merge (fast-forward)" - if possible
-  - "Merge (with commit)" - create merge commit
-  - "Create PR instead" - push and open PR
-  - "Leave on branch" - don't merge yet
-
-## Pull Request Creation
-
-When creating PRs:
-
-1. Push branch with `-u` flag
-2. Create PR with:
-   - Title: conventional commit format (e.g., "feat: add user authentication")
-   - Body: summary of changes, test plan
-3. Show PR URL to user
+`.env` files, secrets, `node_modules`, `__pycache__`, build artifacts, `.gitignore`'d files.

@@ -66,9 +66,11 @@ Use AskUserQuestion:
 
 ## 5. Commit (if fix applied)
 
-If fix was applied and `git.conventional_commits` is true in config:
+If fix was applied and `git.auto_commit` is true in config:
 - Auto-commit with `fix: <description>` message
 - Stage only the modified files
+
+If `auto_commit` is false: ask user before committing.
 
 ## 6. Update State
 

@@ -27,7 +27,7 @@ Write to STATE.md:
 
 Read `.work/config.json` for git settings.
 
-If `git.conventional_commits` is true, auto-commit state files:
+If `git.auto_commit` is true, auto-commit state files:
 
 ```bash
 git add .work/STATE.md .work/PROJECT.md .work/config.json

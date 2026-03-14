@@ -20,7 +20,6 @@ Run multi-specialist verification on a completed phase.
 @workflows/verify.md
 @references/agent-roster.md
 @references/model-profiles.md
-@references/verification-patterns.md
 </execution_context>
 
 <context>

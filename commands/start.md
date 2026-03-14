@@ -22,7 +22,6 @@ Initialize project (if needed) and run the full execution pipeline for a phase.
 @workflows/start.md
 @references/agent-roster.md
 @references/model-profiles.md
-@references/session-continuity.md
 </execution_context>
 
 <context>

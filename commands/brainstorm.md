@@ -22,7 +22,6 @@ Interactive brainstorming session to explore, refine, and scope an idea before c
 <execution_context>
 @workflows/brainstorm.md
 @references/agent-roster.md
-@references/interaction-patterns.md
 </execution_context>
 
 <context>
@@ -37,6 +36,4 @@ The workflow handles:
 2. Interactive exploration loop - clarifying, suggesting, narrowing
 3. Saving brainstorm summary to the phase directory
 4. Handing off to `/do:start` when ready
-
-Use interaction patterns from `@references/interaction-patterns.md` for all user prompts.
 </process>

@@ -20,7 +20,6 @@ Discover and analyze an existing codebase. Generate project-specific context fil
 
 <execution_context>
 @workflows/discover.md
-@references/context-layering.md
 @references/agent-roster.md
 @references/model-profiles.md
 </execution_context>

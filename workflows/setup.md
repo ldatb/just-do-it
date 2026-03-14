@@ -95,7 +95,7 @@ Create `.work/PROJECT.md` from the setup answers:
 
 Based on answers, suggest config.json adjustments:
 - Model profile (quality for enterprise, budget for prototypes)
-- Relevant agents enabled/disabled
+- Model overrides for critical agents
 
 ## 8. Present Summary
 
