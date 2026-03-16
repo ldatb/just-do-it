@@ -1,6 +1,28 @@
 # Intelligence
 
-Four feedback mechanisms that make the system smarter over time without adding complexity.
+Five design principles that make the system smarter and more respectful of user agency.
+
+## 0. Granular User Prompts
+
+Every AskUserQuestion MUST offer granular, per-item options. Never bundle decisions.
+
+### Rules
+
+1. **One decision per prompt.** If there are 3 config settings to change, show 3 individual options — not "Apply all / Review each / Skip."
+2. **Show current → proposed values.** For settings changes, always show `field: current → new`.
+3. **Specific actions, not meta-actions.** Options should describe WHAT happens, not HOW the user wants to review. "Change agents" is better than "Adjust". "Fix now" is better than "Review each."
+4. **3-6 options per prompt.** Fewer than 3 feels restrictive. More than 8 is overwhelming. Aim for 4-6.
+5. **Always include an escape hatch.** "Done", "Skip", "Stop", or "Something else" so the user is never forced.
+6. **No blanket approvals.** Never offer "Apply all" as the primary option. Each item is its own choice.
+
+### Anti-patterns
+
+| Bad | Good |
+| --- | ---- |
+| "Apply all / Review each / Skip" | One option per setting, each showing current → new value |
+| "Adjust" (vague) | "Change agents" / "Change scope" / "Change wave order" (specific) |
+| "Review files" (bulk) | "Review project.md" / "Review engineering.md" / "Review health report" |
+| Bundled preference combos | Individual setting per prompt |
 
 ## 1. Self-Learning Loop
 

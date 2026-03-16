@@ -93,17 +93,32 @@ Create `.work/PROJECT.md` from the setup answers:
 
 ## 7. Configure Settings
 
-Based on answers, suggest config.json adjustments:
-- Model profile (quality for enterprise, budget for prototypes)
-- Model overrides for critical agents
+Based on answers, suggest config.json adjustments as individual options:
+
+Use AskUserQuestion:
+- header: "Setup: Config"
+- question: "Suggested settings based on your answers: (select all that apply)"
+- options: one per suggestion, each showing the setting and why. Examples:
+  - "model_profile: balanced → quality" - enterprise-grade quality bar
+  - "model_overrides.security: → opus" - auth-heavy project
+  - "fast_mode: false → true" - prototype/MVP pace
+  - "Done" - apply selected and continue
 
 ## 8. Present Summary
 
 Show what was generated:
-- Context files created
-- PROJECT.md content
-- Config settings
-- Ask: "Anything to adjust?"
+- List each context file with a one-line description
+- PROJECT.md highlights
+
+Use AskUserQuestion:
+- header: "Setup Complete"
+- question: "Files generated. What to review?"
+- options: one per generated file, plus:
+  - "Review project.md" - check project overview
+  - "Review engineering.md" - check engineering context (if generated)
+  - "Review business.md" - check business context (if generated)
+  - "Review config.json" - check settings
+  - "Looks good, proceed" - accept and move on
 
 ## 9. Update State
 

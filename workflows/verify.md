@@ -47,8 +47,20 @@ Write VERIFY.md with:
 
 ## 6. Act
 
-**CRITICAL findings:** Ask user (fix now / show details / fix later / override).
-If override: record warning in VERIFY.md with date.
+**CRITICAL findings:** Present each finding individually with its own options:
+
+For EACH critical finding, use AskUserQuestion:
+- header: "Critical: [finding title]"
+- question: "[Brief description of the issue, which agent found it, and where]"
+- options:
+  - "Fix now" - dispatch agent to fix this issue
+  - "Show details" - see full finding with code context
+  - "Fix later" - acknowledge but defer to next iteration
+  - "Not an issue" - override with justification (recorded in VERIFY.md)
+  - "Fix all remaining" - auto-fix this and all subsequent critical findings
+
+Do NOT bundle multiple findings into a single "fix all / review / skip" prompt.
+Each finding is a separate decision.
 
 **All PASS:** Print "Phase verified." Update STATE.md.
 

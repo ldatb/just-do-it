@@ -302,15 +302,20 @@ fields, rename fields, or restructure. The config schema is:**
 - `git.use_branches` — boolean
 - `git.conventional_commits` — boolean
 
-Do NOT auto-apply. Show recommendations and ask user:
+Do NOT auto-apply. Show each recommendation as an individual option:
 
 Use AskUserQuestion:
 - header: "Config"
-- question: "Recommended config changes based on discovery. Apply?"
-- options:
-  - "Apply all" - update config.json with all recommendations
-  - "Review each" - go through one by one
-  - "Skip" - keep defaults
+- question: "Recommended config changes based on discovery: (select all that apply)"
+- options: one option per recommendation, each showing current → proposed value. Examples:
+  - "conventional_commits: false → true" - 70% of commits use conventional format
+  - "use_branches: false → true" - feature branch workflow detected
+  - "model_overrides.security: → opus" - complex auth setup warrants stronger model
+  - "Done" - apply selected changes
+
+Present ALL individual recommendations as separate selectable options.
+The user picks which ones they want. "Done" applies only the selected ones.
+Do NOT bundle recommendations into "Apply all" — each setting is its own choice.
 
 ## 6. Generate PROJECT.md
 
@@ -333,11 +338,14 @@ Show the user:
 
 Use AskUserQuestion:
 - header: "Discovery Complete"
-- question: "Discovery generated [N] context files. Review?"
+- question: "Discovery generated [N] context files. What next?"
 - options:
   - "Looks good, proceed" - accept and move on
-  - "Review files" - show each context file for editing
-  - "Re-discover" - run discovery again (maybe with different focus)
+  - "Review project.md" - check the project overview
+  - "Review engineering.md" - check engineering context
+  - "Review agent files" - check agent-specific context files
+  - "Review health report" - check HEALTH.md findings
+  - "Re-discover" - run discovery again with different focus
 
 ## 8. Update State
 

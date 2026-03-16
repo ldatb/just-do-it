@@ -12,34 +12,55 @@ Read `.work/config.json`. If `.work/` doesn't exist: error — no project initia
 
 If $ARGUMENTS is empty: display current settings, then prompt.
 
+Display current config.json values, then show each setting as a directly toggleable option:
+
 Use AskUserQuestion:
 - header: "Settings"
-- question: "What would you like to change?"
-- options:
-  - "Model profile" - quality/balanced/budget
-  - "Fast mode" - on/off
-  - "Git workflow" - branches, commits, auto-commit
-  - "Parallelization" - max concurrent agents
-  - "View all" - show config.json
-  - "Done" - exit
+- question: "Current settings shown above. Select a setting to change:"
+- options: one per setting, showing current value:
+  - "model_profile: [current]" - cycle: balanced → quality → budget
+  - "fast_mode: [current]" - toggle on/off
+  - "git.use_branches: [current]" - toggle on/off
+  - "git.conventional_commits: [current]" - toggle on/off
+  - "git.auto_commit: [current]" - toggle on/off
+  - "parallelization.max_concurrent: [current]" - set: 2/4/6/8
+  - "model_overrides" - add or edit agent-specific model overrides
+  - "Done" - exit settings
 
 ## 3. Handle Selection
 
-### Model Profile
-Options: quality (opus for critical agents) / balanced (sonnet, default) / budget (haiku)
+When user selects a setting, show its specific options:
 
-### Fast Mode
-Toggle on/off. Fast mode: shorter research, quick verify, less ceremony.
+### model_profile
+- "quality" - opus for critical agents, sonnet for rest
+- "balanced" - sonnet for all (default)
+- "budget" - haiku where possible
 
-### Git Workflow
-Options:
-- "Branches + conventional commits" (full)
-- "Commits only" (no branches)
-- "No git" (hands off)
-- "Toggle auto-commit" (auto-commit after each wave)
+### fast_mode
+Toggle: true ↔ false. Shorter research, quick verify, less ceremony.
 
-### Parallelization
-Options: 2 (conservative) / 4 (default) / 6 (aggressive) / 8 (maximum)
+### git.use_branches
+Toggle: true ↔ false. Create feature branches per phase.
+
+### git.conventional_commits
+Toggle: true ↔ false. Use feat:, fix:, etc. format.
+
+### git.auto_commit
+Toggle: true ↔ false. Auto-commit after each wave.
+
+### parallelization.max_concurrent
+- "2" - conservative
+- "4" - default
+- "6" - aggressive
+- "8" - maximum
+
+### model_overrides
+Show current overrides. Then:
+- "Add override" - pick agent, then pick model (haiku/sonnet/opus)
+- "Remove [agent]: [model]" - one option per existing override
+- "Back" - return to main settings
+
+After each change, show updated value and return to the main settings menu.
 
 ## 4. Apply
 

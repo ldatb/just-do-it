@@ -13,15 +13,34 @@ Config drives behavior. Preferences set once, respected automatically.
 2. Copy templates from plugin `templates/` directory — config.json template is the single source of truth
 3. Fill PROJECT.md from $ARGUMENTS, initialize STATE.md
 
-4. Ask preferences via AskUserQuestion (ONCE, never again):
-   - header: "Project Setup"
-   - question: "Set your preferences (saved to config.json, never asked again):"
+4. Ask preferences as individual settings via sequential AskUserQuestion calls (ONCE, never again):
+
+   **4a. Git workflow:**
+   Use AskUserQuestion:
+   - header: "Setup: Git"
+   - question: "How should git work?"
    - options:
-     - "Branches + conventional commits + balanced model" (recommended)
-     - "Branches + conventional commits + quality model"
-     - "Commits only + balanced model"
-     - "No git + budget model"
-     - "Custom" - I'll configure config.json manually
+     - "Feature branches + auto-commit" - full git workflow
+     - "Feature branches, manual commits" - branches but you decide when to commit
+     - "Commits only, no branches" - commit to current branch
+     - "No git" - don't touch git at all
+
+   **4b. Commit style:**
+   Use AskUserQuestion (skip if "No git" chosen):
+   - header: "Setup: Commits"
+   - question: "Commit message style?"
+   - options:
+     - "Conventional commits" - feat:, fix:, etc. (recommended)
+     - "Freeform" - plain descriptive messages
+
+   **4c. Model profile:**
+   Use AskUserQuestion:
+   - header: "Setup: Model"
+   - question: "Model profile for agents?"
+   - options:
+     - "Balanced" - sonnet for most work (recommended)
+     - "Quality" - opus for critical agents
+     - "Budget" - haiku where possible
 
 5. Context detection:
    - Existing code → auto-run discover workflow
@@ -93,7 +112,13 @@ Surface any new implementation decisions (2-3 max) via AskUserQuestion.
 Use AskUserQuestion:
 - header: "Plan Review"
 - question: "Ready to build?"
-- options: "Go" / "Adjust" / "Stop"
+- options:
+  - "Go" - start execution
+  - "Change agents" - add or remove specialists
+  - "Change wave order" - reorganize task sequence
+  - "Change scope" - add or remove tasks
+  - "Re-plan from scratch" - start planning over
+  - "Stop" - save and exit
 
 ## 6. Build
 

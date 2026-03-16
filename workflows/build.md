@@ -79,7 +79,17 @@ Builds with 1-2 waves skip checkpoints — verify catches issues for short build
 
 ### Failures
 
-If a task fails, use AskUserQuestion: Retry / Skip / Debug / Stop.
+If a task fails, use AskUserQuestion:
+- header: "Task Failed"
+- question: "[Agent name] failed: [brief error]. What now?"
+- options:
+  - "Retry same agent" - run the same task again
+  - "Retry with different model" - upgrade model and retry
+  - "Skip this task" - continue without it
+  - "Debug the issue" - dispatch do-debugger to investigate
+  - "Show full error" - see the complete agent output
+  - "Stop build" - pause and save progress
+
 **NEVER do the agent's work yourself.**
 
 ### Git Per Wave

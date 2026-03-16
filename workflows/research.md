@@ -87,10 +87,12 @@ After compiling findings, analyze them and identify:
 
 1. **Print a research summary** (3-5 bullets with key findings and tradeoffs)
 
-2. **For each decision point**, use AskUserQuestion:
+2. **For each decision point**, use a SEPARATE AskUserQuestion:
    - header: "Research: [Decision Topic]"
    - question: "[Clear question explaining why this matters and your recommendation]"
-   - options: [2-4 concrete options, each with a brief tradeoff note]
+   - options: [3-5 concrete options, each with a brief tradeoff note]
+
+   Present each decision individually — never bundle multiple decisions into one prompt.
 
 3. **Give your recommendation** with each question — don't just list options neutrally.
    Say "I recommend X because..." but let the user choose.

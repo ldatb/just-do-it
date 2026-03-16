@@ -204,7 +204,10 @@ Then use AskUserQuestion:
 - question: "Ready to build?"
 - options:
   - "Go" - start execution
-  - "Adjust" - modify the plan
+  - "Change agents" - add or remove specialists
+  - "Change wave order" - reorganize task sequence
+  - "Change scope" - add or remove tasks
+  - "Re-plan from scratch" - start planning over
   - "Stop" - save and exit
 
 ## 8. Update State
