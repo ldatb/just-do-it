@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/lucas/.claude/do/**)",
+      "Bash(grep -n \"SPEC.md\" workflows/*.md)"
+    ]
+  }
+}
