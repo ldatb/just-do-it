@@ -98,11 +98,25 @@ If `git.auto_commit` is true: auto-commit modified files with conventional messa
 If false: ask user before committing.
 Stage specific files only (never `git add .`).
 
-## 3. Results
+## 3. Documentation Update (MANDATORY)
 
-Write brief BUILD.md: wave log (1-2 lines each), files modified, issues encountered.
+After all build waves complete, ALWAYS dispatch `do-docs` to update project documentation:
 
-## 4. State
+1. Dispatch `do-docs` via Agent tool with:
+   - `.work/context/project.md`
+   - Phase PLAN.md and BUILD.md (so it knows what changed)
+   - `./CLAUDE.md` (if exists)
+   - List of all files modified during build
+2. `do-docs` reads what changed and updates any affected documentation (README, CHANGELOG, docs/, etc.)
+3. Note documentation files modified in BUILD.md
+
+This step is NOT optional. Every build must end with a docs update, even in fast mode.
+
+## 4. Results
+
+Write brief BUILD.md: wave log (1-2 lines each), files modified (including docs), issues encountered.
+
+## 5. State
 
 Update STATE.md: step=build, status=complete, next="Verify phase XX".
 

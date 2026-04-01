@@ -31,12 +31,17 @@ Show brief summary in output. Do NOT ask for approval. Proceed immediately.
 Dispatch all task agents in parallel (respecting max_concurrent). Compile BUILD.md.
 If code modified and git configured: auto-commit with conventional message. No prompt.
 
-## 6. Verify
+## 6. Documentation Update (MANDATORY)
+
+Dispatch `do-docs` with phase PLAN.md, BUILD.md, and modified file list.
+Never skipped, even in fast/go mode.
+
+## 7. Verify
 
 Dispatch `do-qa` + `do-reviewer` only.
 If CRITICAL: ask fix now or skip. Otherwise: done.
 
-## 7. Done
+## 8. Done
 
 Update STATE.md. Print: "Done: [what was built]. [N files modified]."
 

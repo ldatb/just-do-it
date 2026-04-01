@@ -133,7 +133,13 @@ Before dispatch: list ALL absolute file paths agents will write. If any are outs
 
 Git commits per config: if `git.auto_commit` is true, auto-commit per wave. If false, ask.
 
-## 7. Verify
+## 7. Documentation Update (MANDATORY)
+
+After build completes, ALWAYS dispatch `do-docs` to update project documentation.
+Pass it the phase PLAN.md, BUILD.md, and the list of modified files.
+This step is never skipped, even in fast mode.
+
+## 8. Verify
 
 **Fast mode:** Dispatch `do-qa` + `do-reviewer` only.
 **Normal mode:** Dispatch all relevant specialists based on files modified:
@@ -144,7 +150,7 @@ Git commits per config: if `git.auto_commit` is true, auto-commit per wave. If f
 
 Compile into phase `VERIFY.md`. If CRITICAL findings: ask user (fix now / review / save for later). If PASS: proceed.
 
-## 8. Complete
+## 9. Complete
 
 Update STATE.md. If `use_branches`: merge to main. If more phases: auto-proceed. If done: stop.
 

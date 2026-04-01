@@ -48,13 +48,15 @@ The "Just do It" system uses specialist agents organized by department. Each age
 | `do-researcher` | Prior art, docs, analysis | Always during Research phase |
 | `do-reviewer` | Code quality, doc quality | Always during Verify |
 | `do-writer` | Docs, comms, content | Writing-heavy deliverables |
+| `do-docs` | Documentation updates | **Always after Build completes** |
 
 ## Mandatory Dispatch Rules
 
 **These rules are NOT optional. The plan MUST include all relevant agents.**
 
-### For any code task:
-- **Build**: `do-coder` (always) + conditional specialists
+### For any task:
+- **Build**: `do-coder` (always for code tasks) + conditional specialists
+- **Docs**: `do-docs` (always after build completes — updates README, CHANGELOG, docs/)
 - **Verify**: `do-qa` + `do-reviewer` (always) + conditional specialists
 
 ### Conditional dispatch (check EVERY condition):
@@ -75,9 +77,10 @@ The "Just do It" system uses specialist agents organized by department. Each age
 ### Wave ordering:
 1. **Design wave**: `do-architect`, `do-product` (decisions first)
 2. **Build wave(s)**: `do-coder` + domain specialists (implementation)
-3. **Verify wave**: `do-qa`, `do-reviewer` + conditional specialists (review)
+3. **Docs wave**: `do-docs` (update all project documentation to reflect changes)
+4. **Verify wave**: `do-qa`, `do-reviewer` + conditional specialists (review)
 
-Design agents run BEFORE implementation agents. Always.
+Design agents run BEFORE implementation agents. Docs run AFTER build, BEFORE verify. Always.
 
 ## Example Dispatches
 

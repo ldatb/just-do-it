@@ -2,10 +2,10 @@
 
 # JUST DO IT
 
-**A full company in a single Claude Code plugin. 25 specialist agents for engineering, marketing, sales, finance, HR, legal, product, design, and operations.**
+**A full company in a single Claude Code plugin. 26 specialist agents for engineering, marketing, sales, finance, HR, legal, product, design, and operations.**
 
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
-[![Agents](https://img.shields.io/badge/agents-25-green?style=for-the-badge)]()
+[![Agents](https://img.shields.io/badge/agents-26-green?style=for-the-badge)]()
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-8A2BE2?style=for-the-badge)]()
 
 <br>
@@ -40,7 +40,8 @@ The same plugin handles code, marketing plans, sales decks, HR policies, legal r
 1. RESEARCH  -> do-researcher finds libraries, patterns, risks
 2. PLAN      -> tasks grouped by wave with agent assignments (you approve)
 3. BUILD     -> do-coder implements, do-security hardens auth (in parallel)
-4. VERIFY    -> do-qa writes tests, do-reviewer checks quality (in parallel)
+4. DOCS      -> do-docs updates README, CHANGELOG, docs/ (always)
+5. VERIFY    -> do-qa writes tests, do-reviewer checks quality (in parallel)
 ```
 
 At each step, you get a prompt with selectable options. Nothing happens without your say.
@@ -157,7 +158,7 @@ Your `.work/` project directories are not removed.
 /do:debug "login endpoint returns 500" # scientific debugging with specialist
 ```
 
-## 25 Specialist Agents
+## 26 Specialist Agents
 
 Every agent has deep domain expertise. The orchestrator classifies your work and dispatches the right specialists automatically.
 
@@ -203,13 +204,14 @@ Every agent has deep domain expertise. The orchestrator classifies your work and
 | `do-product` | PRDs, roadmaps, feature prioritization, user stories |
 | `do-designer` | UI/UX specs, design systems, accessibility, branding |
 
-### Cross-Cutting (3)
+### Cross-Cutting (4)
 
 | Agent | Domain |
 | ----- | ------ |
 | `do-researcher` | Prior art, libraries, documentation, technology research |
 | `do-reviewer` | Code quality, patterns, readability, convention adherence |
 | `do-writer` | Technical docs, internal comms, presentations, content |
+| `do-docs` | Documentation updates — README, CHANGELOG, docs/ kept in sync with code |
 
 ## Context Layering
 

@@ -1,6 +1,6 @@
 # Just do It - A Full Company in a Plugin
 
-Lean, agent-first execution system for Claude Code. 25 specialist agents covering engineering, security, marketing, sales, finance, HR, legal, product, design, operations, and more.
+Lean, agent-first execution system for Claude Code. 26 specialist agents covering engineering, security, marketing, sales, finance, HR, legal, product, design, operations, and more.
 
 ## Philosophy
 
@@ -60,7 +60,7 @@ This copies files to `~/.claude/`:
 | `/do:save` | Save state for later |
 | `/do:settings [key value]` | Configure model profiles, agents, etc. |
 
-## Agents (25 Specialists)
+## Agents (26 Specialists)
 
 ### Engineering
 - **do-coder** - Pure implementation
@@ -96,6 +96,7 @@ This copies files to `~/.claude/`:
 - **do-researcher** - Prior art, documentation, analysis
 - **do-reviewer** - Code and document quality
 - **do-writer** - Technical writing, comms, content
+- **do-docs** - Documentation updates (README, CHANGELOG, docs/)
 
 ## Context Layering
 
