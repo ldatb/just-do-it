@@ -7,7 +7,7 @@ prompts, no plan approval, single wave. Only stops for CRITICAL findings.
 
 ## 1. Initialize
 
-**No `.work/`:** Create it with defaults: fast_mode=true, balanced profile, commits only.
+**No `.work/`:** Create `.work/` with: PROJECT.md (from $ARGUMENTS), STATE.md, config.json (defaults: fast_mode=true, balanced profile, commits only), capabilities.md, context/
 If existing code: quick single-agent discovery (stack + structure only). If greenfield: skip.
 
 **`.work/` exists:** Read state and config. Force fast_mode on for this execution.
@@ -28,18 +28,36 @@ Show brief summary in output. Do NOT ask for approval. Proceed immediately.
 
 ## 5. Build
 
+If `git.use_branches` is true:
+- Print: "Creating branch feat/<phase-name>..."
+- Create the branch.
+
 Dispatch all task agents in parallel (respecting max_concurrent). Compile BUILD.md.
-If code modified and git configured: auto-commit with conventional message. No prompt.
+
+If code modified:
+- If `git.auto_commit` is true: print `Auto-committing: <type>: <description> (<N> files)...` then auto-commit with conventional message.
+- If `git.auto_commit` is false: ask user before committing.
 
 ## 6. Documentation Update (MANDATORY)
 
+Print: "Dispatching do-docs to update project documentation. (Always runs after build.)"
 Dispatch `do-docs` with phase PLAN.md, BUILD.md, and modified file list.
 Never skipped, even in fast/go mode.
 
 ## 7. Verify
 
 Dispatch `do-qa` + `do-reviewer` only.
-If CRITICAL: ask fix now or skip. Otherwise: done.
+
+For each CRITICAL finding:
+
+Use AskUserQuestion:
+- header: "Critical Finding"
+- question: "<description of the finding>"
+- options:
+  - "Fix now (Recommended)" - dispatch agent to fix immediately
+  - "Skip" - proceed without fixing; recorded in VERIFY.md
+
+Otherwise: done.
 
 ## 8. Done
 
@@ -49,5 +67,6 @@ Update STATE.md. Print: "Done: [what was built]. [N files modified]."
 
 <rules>
 Speed over ceremony. Every prompt that can be skipped, skip it.
+Every automated action gets a status line before it happens.
 If the task fails, suggest `/do:start` for a more structured approach.
 </rules>

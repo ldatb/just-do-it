@@ -35,5 +35,5 @@ The workflow handles:
 1. Opening the conversation (or picking up from $ARGUMENTS)
 2. Interactive exploration loop - clarifying, suggesting, narrowing
 3. Saving brainstorm summary to the phase directory
-4. Handing off to `/do:start` when ready
+4. Directly invoking the start pipeline when the user selects "Start building" - no manual command needed
 </process>

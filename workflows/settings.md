@@ -1,69 +1,136 @@
 <purpose>
-View or modify project configuration.
+View or modify project configuration. Flat menu, 2 levels max.
 </purpose>
 
 <process>
 
 ## 1. Load
 
-Read `.work/config.json`. If `.work/` doesn't exist: error — no project initialized.
+Read `.work/config.json`. If `.work/` doesn't exist: error — no project initialized. Suggest `/do:start`.
 
-## 2. Menu
+## 2. Display and Menu (Level 1)
 
-If $ARGUMENTS is empty: display current settings, then prompt.
+Display current config values:
 
-Display current config.json values, then show each setting as a directly toggleable option:
+```
+model_profile:               [value]
+fast_mode:                   [value]
+git.use_branches:            [value]
+git.auto_commit:             [value]
+parallelization.max_concurrent: [value]
+```
+
+If any model_overrides exist, list each one:
+```
+Agent overrides:
+  do-architect: opus
+  do-security: opus
+```
+
+Then present the main settings menu:
 
 Use AskUserQuestion:
 - header: "Settings"
-- question: "Current settings shown above. Select a setting to change:"
-- options: one per setting, showing current value:
-  - "model_profile: [current]" - cycle: balanced → quality → budget
-  - "fast_mode: [current]" - toggle on/off
-  - "git.use_branches: [current]" - toggle on/off
-  - "git.conventional_commits: [current]" - toggle on/off
-  - "git.auto_commit: [current]" - toggle on/off
-  - "parallelization.max_concurrent: [current]" - set: 2/4/6/8
-  - "model_overrides" - add or edit agent-specific model overrides
-  - "Done" - exit settings
+- question: "Select a setting to change, or Done to exit."
+- options:
+  - "model_profile: [current]" - cycle to next: balanced -> quality -> budget -> balanced
+  - "fast_mode: [current]" - toggle to: [opposite]
+  - "Git settings" - configure use_branches, auto_commit, and conventional_commits
+  - "Agent model overrides" - add or remove model overrides per agent
+  - "Done" - save and exit settings
+
+If existing model_overrides are present, they are managed through "Agent model overrides" (Level 2).
 
 ## 3. Handle Selection
 
-When user selects a setting, show its specific options:
-
 ### model_profile
-- "quality" - opus for critical agents, sonnet for rest
-- "balanced" - sonnet for all (default)
-- "budget" - haiku where possible
+
+Cycle to the next value in sequence: balanced -> quality -> budget -> balanced.
+Apply immediately to config.json.
+Print: `model_profile set to [new value]`
+Return to Level 1 menu.
 
 ### fast_mode
-Toggle: true ↔ false. Shorter research, quick verify, less ceremony.
 
-### git.use_branches
-Toggle: true ↔ false. Create feature branches per phase.
+Toggle the current boolean value.
+Apply immediately to config.json.
+Print: `fast_mode set to [new value]`
+Return to Level 1 menu.
 
-### git.conventional_commits
-Toggle: true ↔ false. Use feat:, fix:, etc. format.
+### Git settings (Level 2)
 
-### git.auto_commit
-Toggle: true ↔ false. Auto-commit after each wave.
+Display current git config values:
+```
+git.use_branches:        [value]
+git.auto_commit:         [value]
+git.conventional_commits: [value]
+```
 
-### parallelization.max_concurrent
-- "2" - conservative
-- "4" - default
-- "6" - aggressive
-- "8" - maximum
+Use AskUserQuestion:
+- header: "Settings: Git"
+- question: "Select a git setting to toggle, or Done to return."
+- options:
+  - "git.use_branches: [current]" - toggle to: [opposite]; feature branch per phase
+  - "git.auto_commit: [current]" - toggle to: [opposite]; auto-commit after each wave
+  - "git.conventional_commits: [current]" - toggle to: [opposite]; enforce feat:/fix: prefix format
+  - "Done" - return to main settings menu
 
-### model_overrides
-Show current overrides. Then:
-- "Add override" - pick agent, then pick model (haiku/sonnet/opus)
-- "Remove [agent]: [model]" - one option per existing override
-- "Back" - return to main settings
+When the user selects a toggle: apply to config.json immediately, print the updated value, re-present this Level 2 menu.
+When the user selects "Done": return to Level 1 menu.
 
-After each change, show updated value and return to the main settings menu.
+This is the final level for git settings. There is no Level 3.
 
-## 4. Apply
+### Agent model overrides (Level 2)
 
-Update config.json. Show updated setting. Ask if more changes or done.
+Display existing overrides (if any):
+```
+Agent overrides:
+  [agent]: [model]
+  ...
+```
+
+Use AskUserQuestion:
+- header: "Settings: Agent Overrides"
+- question: "Add an override or remove an existing one."
+- options:
+  - "Add override" - set a specific model for one agent
+  - "Remove [agent]: [model]" (one entry per existing override, up to 3)
+  - "Done" - return to main settings menu
+
+If there are more than 3 existing overrides, show only the first 3 and add "See all overrides" as an option.
+
+**Add override:**
+
+Use AskUserQuestion:
+- header: "Settings: Agent Override"
+- question: "Which agent should use a non-default model?"
+- options:
+  - "do-architect -> opus (Recommended)" - architecture decisions benefit from deep reasoning
+  - "do-security -> opus" - security review warrants the strongest model
+  - "do-coder -> haiku" - fast code generation at lower cost
+  - "Other" - specify agent and model manually
+
+When the user selects an option (not "Other"):
+- Apply the override to config.json under `model_overrides`
+- Print: `Override set: [agent] will use [model]`
+- Return to Agent model overrides menu.
+
+When the user selects "Other":
+- Ask: which agent name and which model (haiku/sonnet/opus) — one focused question
+- Apply and return to Agent model overrides menu.
+
+**Remove [agent]: [model]:**
+
+Remove that entry from `model_overrides` in config.json.
+Print: `Override removed: [agent] will use profile default`
+Return to Agent model overrides menu.
+
+**Done:** Return to Level 1 menu.
+
+This is the final level for overrides. There is no Level 3.
+
+### Done
+
+Exit settings. No further action.
 
 </process>

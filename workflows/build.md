@@ -11,7 +11,7 @@ Do NOT write application code. Do NOT carry agent results in your context.
 ## 1. Load
 
 1. Read STATE.md, config.json, phase PLAN.md
-2. If no PLAN.md: error — run `/do:plan` first
+2. If no PLAN.md: error — run `/do:start` to plan first
 
 ## 2. Execute Waves
 
@@ -73,7 +73,13 @@ For builds with 3+ waves: after every 2 completed waves, pause and check alignme
 
 - **On track:** Continue. Log "Checkpoint: on track."
 - **Minor drift:** Adjust next wave's agent prompts to correct. Log adjustment in BUILD.md.
-- **Major drift:** Stop. Tell user what drifted. Use AskUserQuestion: Continue / Re-plan / Stop.
+- **Major drift:** Stop. Tell user what drifted. Use AskUserQuestion:
+  - header: "Build: Drift Detected"
+  - question: "[What drifted and why it matters]. How would you like to proceed?"
+  - options:
+    - "Continue with corrections (Recommended)" - adjust remaining waves to get back on track
+    - "Re-plan remaining waves" - revise PLAN.md for the outstanding work
+    - "Stop and review" - pause here and inspect results before deciding
 
 Builds with 1-2 waves skip checkpoints — verify catches issues for short builds.
 
@@ -83,38 +89,71 @@ If a task fails, use AskUserQuestion:
 - header: "Task Failed"
 - question: "[Agent name] failed: [brief error]. What now?"
 - options:
-  - "Retry same agent" - run the same task again
+  - "Retry same agent (Recommended)" - run the same task again
   - "Retry with different model" - upgrade model and retry
-  - "Skip this task" - continue without it
-  - "Debug the issue" - dispatch do-debugger to investigate
-  - "Show full error" - see the complete agent output
-  - "Stop build" - pause and save progress
+  - "Skip this task" - continue without it; note skipped in BUILD.md
+  - "Stop build" - pause and save progress for later
 
 **NEVER do the agent's work yourself.**
 
 ### Git Per Wave
 
-If `git.auto_commit` is true: auto-commit modified files with conventional message. No prompt.
+If `git.auto_commit` is true:
+Print: `Auto-committing: <type>: <description> (<N> files)...`
+Then auto-commit modified files with conventional message. Stage specific files only (never `git add .`).
+
 If false: ask user before committing.
-Stage specific files only (never `git add .`).
 
 ## 3. Documentation Update (MANDATORY)
 
-After all build waves complete, ALWAYS dispatch `do-docs` to update project documentation:
+After all build waves complete:
 
-1. Dispatch `do-docs` via Agent tool with:
+Print: `Dispatching do-docs to update project documentation. (Always runs after build.)`
+
+Then dispatch `do-docs` via Agent tool with:
    - `.work/context/project.md`
    - Phase PLAN.md and BUILD.md (so it knows what changed)
    - `./CLAUDE.md` (if exists)
    - List of all files modified during build
-2. `do-docs` reads what changed and updates any affected documentation (README, CHANGELOG, docs/, etc.)
-3. Note documentation files modified in BUILD.md
+
+`do-docs` reads what changed and updates any affected documentation (README, CHANGELOG, docs/, etc.)
+Note documentation files modified in BUILD.md.
 
 This step is NOT optional. Every build must end with a docs update, even in fast mode.
 
+## 3.5. Quality Verification Loop (Code Changes Only)
+
+Skip this step if no application code was modified (docs-only, config-only changes skip).
+
+After build waves and docs update complete, run a verification loop:
+
+1. **Dispatch audit agents in parallel:**
+   - `do-security`: Security audit of all modified files
+   - `do-perf`: Performance review of all modified files
+   - `do-reviewer`: KISS/Kodawari/DRY/SOLID compliance review
+
+2. **Compile findings.** Merge by severity using consensus rules from `references/intelligence.md`.
+
+3. **If CRITICAL or HIGH findings exist:**
+   - Dispatch `do-coder` to fix all CRITICAL and HIGH issues
+   - After fixes: return to step 1 (re-audit)
+   - Maximum 3 iterations. If still failing after 3: stop and present findings to user.
+
+4. **If only MEDIUM/LOW or no findings:** Proceed to results.
+
+Print status line before each iteration:
+```
+Quality audit: iteration N of 3...
+```
+
+This loop ensures every code change ships with security, performance, and quality validation built in.
+
 ## 4. Results
 
-Write brief BUILD.md: wave log (1-2 lines each), files modified (including docs), issues encountered.
+Write BUILD.md with:
+- Wave log: one entry per wave with format `Wave N - [timestamp] - [model profile] - [summary]`
+- Files modified (including docs)
+- Issues encountered
 
 ## 5. State
 

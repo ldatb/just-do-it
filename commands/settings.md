@@ -1,6 +1,6 @@
 ---
 name: do:settings
-description: View or modify project settings (model profile, agents, parallelization).
+description: View or change project configuration.
 argument-hint: <setting value>
 allowed-tools:
   - Read

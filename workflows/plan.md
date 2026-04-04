@@ -31,10 +31,10 @@ If no research exists, do a quick research pass first (use **Agent tool** to dis
 
 Before selecting agents, classify the task complexity per `references/intelligence.md` § Cost-Aware Routing:
 
-- **trivial** (single file, <50 lines, no risk surface) → `do-coder` only, skip verify agents
-- **simple** (1-3 files, single concern) → `do-coder` + `do-qa` + `do-reviewer`, skip design wave
-- **standard** (multi-file, may involve architecture/security) → full dispatch
-- **complex** (cross-cutting, multiple domains) → full dispatch + consider quality profile
+- **trivial** (single file, <50 lines, no risk surface) -> `do-coder` only, skip verify agents
+- **simple** (1-3 files, single concern) -> `do-coder` + `do-qa` + `do-reviewer`, skip design wave
+- **standard** (multi-file, may involve architecture/security) -> full dispatch
+- **complex** (cross-cutting, multiple domains) -> full dispatch + consider quality profile
 
 Any risk surface (auth, data, money, external systems) = at least **standard**.
 
@@ -44,9 +44,9 @@ Note the complexity level in PLAN.md header. If trivial or simple, skip the step
 
 If `.work/learnings.json` exists, read it. Look for entries with matching `task_type` or `domain` (3+ matches = a pattern):
 
-- Agent that consistently catches issues early → promote to earlier wave
-- Agent that never finds issues for this task type → skip in fast_mode
-- Model profile that produced failures → suggest upgrade
+- Agent that consistently catches issues early -> promote to earlier wave
+- Agent that never finds issues for this task type -> skip in fast_mode
+- Model profile that produced failures -> suggest upgrade
 
 Note any learnings-based adjustments in PLAN.md under `## Decisions`.
 
@@ -139,7 +139,7 @@ Examples:
 For each decision, use AskUserQuestion:
 - header: "Planning: [Decision Topic]"
 - question: "[Clear question with your recommendation and why]"
-- options: [2-4 concrete options with tradeoff notes]
+- options: [2-4 concrete options, first option marked (Recommended), with tradeoff notes]
 
 Keep to 2-4 decision questions max. Don't ask about things already decided in research.
 
@@ -186,9 +186,13 @@ Write `PLAN.md` in the phase directory, incorporating user decisions from steps 
 
 ## 7. Present Plan (MANDATORY - do not skip)
 
-**You MUST explain the plan to the user before asking for approval.**
+**You MUST present the plan to the user before asking for approval.**
 
-Print a clear summary that includes:
+For **trivial** complexity tasks, print a concise one-paragraph summary: what changes, which file, done criteria. No need for a full breakdown.
+
+For **simple** complexity tasks, print: goal, which agents, which files, done criteria. Keep it brief.
+
+For **standard** or **complex** tasks, print a full summary that includes:
 - **Goal**: What this phase achieves
 - **Decisions**: What the user chose and how it shapes the plan
 - **Approach**: Key technical/design decisions and rationale
@@ -200,15 +204,13 @@ The user should understand the plan well enough to give informed approval.
 Do NOT just write PLAN.md silently and ask "Go?". EXPLAIN it.
 
 Then use AskUserQuestion:
-- header: "Plan"
-- question: "Ready to build?"
+- header: "Plan Review"
+- question: "[N] waves, [N] agents, ~[N] files. Ready to build?"
 - options:
-  - "Go" - start execution
-  - "Change agents" - add or remove specialists
-  - "Change wave order" - reorganize task sequence
-  - "Change scope" - add or remove tasks
-  - "Re-plan from scratch" - start planning over
-  - "Stop" - save and exit
+  - "Go (Recommended)" - start execution as planned
+  - "Change scope" - modify tasks, agents, or wave order
+  - "Re-plan" - start planning over with different requirements
+  - "Stop" - save plan and exit without building
 
 ## 8. Update State
 

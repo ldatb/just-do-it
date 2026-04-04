@@ -1,6 +1,6 @@
 ---
 name: do:help
-description: Show all available commands and how to use them.
+description: Show available commands and current project state.
 allowed-tools:
   - Read
   - Glob

@@ -1,7 +1,7 @@
 <purpose>
 Standalone research on a topic, technology, or approach. Dispatches do-researcher agents,
 presents findings with tradeoffs, asks the user about key decisions, and produces RESEARCH.md.
-Can run independently or feed into /do:plan.
+Can run independently or feed into the plan phase.
 </purpose>
 
 <process>
@@ -90,18 +90,18 @@ After compiling findings, analyze them and identify:
 2. **For each decision point**, use a SEPARATE AskUserQuestion:
    - header: "Research: [Decision Topic]"
    - question: "[Clear question explaining why this matters and your recommendation]"
-   - options: [3-5 concrete options, each with a brief tradeoff note]
+   - options: [2-4 concrete options, first option marked (Recommended), each with a brief tradeoff note]
 
    Present each decision individually — never bundle multiple decisions into one prompt.
 
 3. **Give your recommendation** with each question — don't just list options neutrally.
-   Say "I recommend X because..." but let the user choose.
+   The first option must always be the recommended one, marked with `(Recommended)`.
 
 ### Rules:
 - Keep decision questions to 2-4 max per research session
 - Don't ask about things config already answers
 - Only ask about decisions that genuinely affect the outcome
-- Always include a recommended option
+- Always mark the first option with (Recommended)
 - After getting answers, save decisions to RESEARCH.md under `## Decisions`
 
 ## 5. Update State

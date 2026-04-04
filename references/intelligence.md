@@ -11,9 +11,12 @@ Every AskUserQuestion MUST offer granular, per-item options. Never bundle decisi
 1. **One decision per prompt.** If there are 3 config settings to change, show 3 individual options — not "Apply all / Review each / Skip."
 2. **Show current → proposed values.** For settings changes, always show `field: current → new`.
 3. **Specific actions, not meta-actions.** Options should describe WHAT happens, not HOW the user wants to review. "Change agents" is better than "Adjust". "Fix now" is better than "Review each."
-4. **3-6 options per prompt.** Fewer than 3 feels restrictive. More than 8 is overwhelming. Aim for 4-6.
+4. **2-4 options per prompt.** AskUserQuestion supports 2-4 authored options. A fifth "Other" is always available automatically. Do not exceed 4.
 5. **Always include an escape hatch.** "Done", "Skip", "Stop", or "Something else" so the user is never forced.
 6. **No blanket approvals.** Never offer "Apply all" as the primary option. Each item is its own choice.
+7. _(reserved)_
+8. _(reserved)_
+9. **Recommended option always first.** Every AskUserQuestion must have exactly one option with a `(Recommended)` suffix. That option appears first in the list.
 
 ### Anti-patterns
 

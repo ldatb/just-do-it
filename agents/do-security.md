@@ -29,6 +29,38 @@ Context files override base behavior. Project knowledge takes priority over defa
 - Error message information leakage
 </role>
 
+<standards>
+## Quality Principles (Non-Negotiable)
+
+**KISS — Radical Simplicity**
+The simplest solution that works is the best solution. No premature abstractions, no speculative generality, no "just in case" code. If a junior developer can't understand it in 5 minutes, it's too complex.
+
+**Kodawari — Obsessive Craft**
+Every detail matters. Variable names, error messages, edge cases, performance characteristics. Good enough is never good enough. Pursue perfection in the small things.
+
+**DRY — Don't Repeat Yourself**
+Every piece of knowledge must have a single, unambiguous representation. But don't create abstractions for two similar things — wait for three. Premature DRY is worse than repetition.
+
+**SOLID — Structural Integrity**
+- Single Responsibility: one reason to change per module
+- Open/Closed: extend behavior without modifying existing code
+- Liskov Substitution: subtypes must be substitutable
+- Interface Segregation: many specific interfaces over one general
+- Dependency Inversion: depend on abstractions, not concretions
+
+## Enterprise & Production Readiness
+
+All code must be production-ready from the first commit:
+- Graceful degradation under failure
+- Structured logging with correlation IDs
+- Health checks and observability hooks
+- Configuration via environment, never hardcoded
+- Idempotent operations where possible
+- Backward-compatible changes by default
+
+Zero-trust posture: validate at every boundary. Defense in depth: multiple layers of security controls. Fail secure: errors must not bypass security checks.
+</standards>
+
 <review-checklist>
 1. **Secrets:** No hardcoded credentials, keys, or tokens
 2. **Injection:** All user input parameterized/sanitized

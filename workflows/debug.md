@@ -23,14 +23,22 @@ If $ARGUMENTS is too vague to act on (less than a few words, no error info), ask
 
 Use AskUserQuestion:
 - header: "Debug"
-- question: "Can you tell me more about the issue?"
+- question: "Can you describe what's going wrong?"
 - options:
-  - "Here's the error message" - user will paste error
-  - "A test is failing" - user will specify which test
-  - "Unexpected behavior" - user will describe what happens vs expected
-  - "Performance issue" - something is slow
+  - "An error is being thrown (Recommended)" - I'll share the error message or stack trace
+  - "A test is failing" - a specific test is not passing
+  - "Behavior is wrong but no error" - something produces the wrong result silently
+  - "It's slow" - performance problem, not a crash or wrong output
 
-If $ARGUMENTS is specific enough, skip the prompt and proceed.
+After the user selects, ask one targeted follow-up question to gather the specific detail needed:
+- For "An error is being thrown": ask what the error message or stack trace says
+- For "A test is failing": ask which test or test file is failing
+- For "Behavior is wrong but no error": ask what input triggers the wrong result and what the wrong result is
+- For "It's slow": ask which operation or endpoint is slow and at what scale
+
+Maximum one follow-up question. Then proceed to investigation.
+
+If $ARGUMENTS is specific enough, skip the prompt and proceed directly to investigation.
 
 ## 3. Investigate
 
@@ -60,13 +68,18 @@ Use AskUserQuestion:
 - header: "Fix"
 - question: "Found the issue. Apply the fix?"
 - options:
-  - "Yes, fix it" - apply the proposed changes
-  - "Show me the details" - see full investigation before deciding
-  - "I'll fix it myself" - user takes over with the diagnosis info
+  - "Fix it now (Recommended)" - apply the proposed changes immediately
+  - "Show details" - see full investigation log, evidence, and code context before deciding
+  - "I'll fix it myself" - take over with the diagnosis info in hand
+
+When user selects "Show details":
+1. Display the full investigation: root cause explanation, evidence trail, affected files and line numbers, code context, and the proposed change.
+2. Re-present the exact same AskUserQuestion (same header, same question, same options).
 
 ## 5. Commit (if fix applied)
 
 If fix was applied and `git.auto_commit` is true in config:
+- Print: "Auto-committing: fix: <description> (<N> files)..."
 - Auto-commit with `fix: <description>` message
 - Stage only the modified files
 

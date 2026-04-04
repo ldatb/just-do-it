@@ -48,10 +48,12 @@ with template defaults (don't overwrite existing values).
 
 **If `.work/context/` already has files (re-discovery):**
 - Back up existing context to `.work/context/.backup/` (timestamped)
-- Warn user: "Existing context files will be regenerated. Backups saved."
+- Print: `Backing up existing context files to .work/context/.backup/<timestamp>/...`
 - This preserves any manual edits the user made.
 
 ## 2. Dispatch Discovery Agents (Parallel)
+
+Print: `Dispatching 6 discovery agents to analyze the codebase...`
 
 **Use the Agent tool** to launch up to 6 `do-researcher` agents in parallel. Each agent MUST read the codebase deeply - not just skim file names.
 
@@ -141,6 +143,8 @@ Analyze the codebase for:
 Output: security posture, environment map, vulnerability notes
 
 ## 3. Compile Context Files
+
+Print: `Compiling context files from discovery results...`
 
 From the 6 agent outputs, generate ALL relevant context files:
 
@@ -251,6 +255,8 @@ Only create agent-specific files when the discovery reveals meaningful content f
 
 ## 4. Generate Codebase Health Report
 
+Print: `Generating codebase health report...`
+
 Create `.work/HEALTH.md`:
 
 ```markdown
@@ -282,40 +288,35 @@ Create `.work/HEALTH.md`:
 3. [Third most impactful]
 ```
 
-## 5. Generate Recommended Config
+## 5. Generate Config Recommendations
 
 Read the current `.work/config.json`. Ensure it follows the template schema exactly.
 
-Recommend project-specific changes based on discovery findings:
+Determine project-specific recommendations based on discovery findings:
 - Add `model_overrides` for critical agents (e.g., `"security": "opus"` if complex security setup)
 - Set `git.conventional_commits` based on what was found in history
 - Set `git.use_branches` based on current git workflow
 - Adjust `parallelization.max_concurrent` if needed
 
 **CRITICAL: Only modify values within the existing template structure. Do NOT add new top-level
-fields, rename fields, or restructure. The config schema is:**
-- `model_profile` — string
-- `model_overrides` — object of agent:model pairs
-- `fast_mode` — boolean
-- `parallelization.max_concurrent` — number
-- `git.auto_commit` — boolean
-- `git.use_branches` — boolean
-- `git.conventional_commits` — boolean
+fields, rename fields, or restructure.**
 
-Do NOT auto-apply. Show each recommendation as an individual option:
+Present recommendations using an iterative single-select loop. Do NOT ask the user to "select all that apply."
 
 Use AskUserQuestion:
-- header: "Config"
-- question: "Recommended config changes based on discovery: (select all that apply)"
-- options: one option per recommendation, each showing current → proposed value. Examples:
-  - "conventional_commits: false → true" - 70% of commits use conventional format
-  - "use_branches: false → true" - feature branch workflow detected
-  - "model_overrides.security: → opus" - complex auth setup warrants stronger model
-  - "Done" - apply selected changes
+- header: "Config: Recommendations"
+- question: "Discovery found <N> recommended adjustments. Apply one, or select Done when finished."
+- options:
+  - "<setting>: <current> -> <recommended> (Recommended)" - <one-sentence rationale>
+  - "<setting>: <current> -> <recommended>" - <one-sentence rationale>
+  - "<setting>: <current> -> <recommended>" - <one-sentence rationale>
+  - "Done" - proceed without further changes
 
-Present ALL individual recommendations as separate selectable options.
-The user picks which ones they want. "Done" applies only the selected ones.
-Do NOT bundle recommendations into "Apply all" — each setting is its own choice.
+After each selection (except "Done"): apply the change to config.json immediately, print the updated value (e.g., `conventional_commits set to true`), then re-present the menu with that option removed.
+
+When "Done" is selected: proceed to Step 6.
+
+If no recommendations exist, skip this step.
 
 ## 6. Generate PROJECT.md
 
@@ -338,21 +339,20 @@ Show the user:
 
 Use AskUserQuestion:
 - header: "Discovery Complete"
-- question: "Discovery generated [N] context files. What next?"
+- question: "Discovery generated <N> context files. What next?"
 - options:
-  - "Looks good, proceed" - accept and move on
-  - "Review project.md" - check the project overview
-  - "Review engineering.md" - check engineering context
-  - "Review agent files" - check agent-specific context files
-  - "Review health report" - check HEALTH.md findings
+  - "Looks good, proceed (Recommended)" - accept all generated context and move on
+  - "Review generated files" - show a summary of project.md, engineering.md, and HEALTH.md findings
   - "Re-discover" - run discovery again with different focus
+
+When user selects "Review generated files": display a combined summary showing the project overview (project.md), engineering context (engineering.md), and health report findings (HEALTH.md score, top concerns, recommended actions), then re-present the identical AskUserQuestion.
 
 ## 8. Update State
 
 Update STATE.md:
 - Status: discovered
-- Last Action: Deep codebase discovery complete ([N] context files generated)
-- Next Action: Ready for work - use `/do:start`, `/do:it`, or `/do:plan`
+- Last Action: Deep codebase discovery complete (<N> context files generated)
+- Next Action: Ready for work
 
 </process>
 
@@ -360,6 +360,8 @@ Update STATE.md:
 In fast mode, reduce to 2 agents instead of 6:
 - Agent 1: Stack, structure, architecture, conventions (combined)
 - Agent 2: Quality, security, git history (combined)
+
+Print: `Dispatching 2 discovery agents (fast mode)...`
 
 Generate fewer context files: project.md, engineering.md, and only the most relevant agent-specific files (max 3).
 Skip health report. Skip config recommendations.

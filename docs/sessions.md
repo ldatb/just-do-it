@@ -63,52 +63,39 @@ What happens:
 5. Creates first phase directory
 6. Begins the pipeline: Research -> Plan -> Build -> Verify
 
-If `.work/` already exists, it reads STATE.md and continues from where you left off (same as `/do:resume`).
+If `.work/` already exists, it reads STATE.md and continues from where you left off automatically — no separate resume command needed.
 
 ### 2. Pausing Work
 
-**Command:** `/do:save` (or `/do:pause` - they are aliases)
+**State saves automatically** throughout execution. You do not need a manual save command. Simply close Claude Code — STATE.md is updated at every significant transition, so your work is always recoverable.
 
-What happens:
-1. Reads current STATE.md
-2. Captures the exact current position:
-   - Which phase
-   - Which step (research, plan, build, verify)
-   - Which wave/task if mid-build
-   - Any in-flight decisions or context
-3. Updates STATE.md with:
-   - Status -> `paused`
-   - Last Updated -> current timestamp
-   - Last Action -> what was just completed
-   - Next Action -> exactly what to do when resuming
-   - Context -> decisions and state from this session
-   - Pending -> incomplete items
-4. Optionally commits state files to git (if `git.auto_commit` is true in config.json)
-5. Confirms: "Work saved. Resume with `/do:resume`."
-
-**You can also just close Claude Code.** The plugin updates STATE.md throughout execution, so even without an explicit save, the state is recoverable. `/do:save` just ensures a clean save point.
+If you want to verify what is saved, run `/do:status` to see the current STATE.md content.
 
 ### 3. Resuming Work
 
-**Command:** `/do:resume`
+**Command:** `/do:start` (with or without a new description)
 
-What happens:
-1. Reads `.work/STATE.md` - determines current position
-2. Reads `.work/PROJECT.md` - loads project context
-3. Reads the current phase directory - loads phase-specific state
-4. Displays to you:
-   - Project name and description
-   - Current phase and step
-   - Last action taken
-   - Next action planned
-   - Any pending items
-5. Asks: "Continue with: [next action]?"
-6. On confirmation, executes the appropriate workflow step
+When `.work/config.json` already exists, `/do:start` reads STATE.md and displays a context block:
+
+```
+Project: <name>
+Phase: 02-add-oauth (build - wave 2 of 3)
+Last: Built authentication middleware (3 files)
+Next: Complete build wave 3, then verify
+
+Phases:
+  [x] 01-rest-api - complete
+  [>] 02-add-oauth - in progress
+```
+
+It then presents navigation options based on the current state — continue, review what was built, or start something new.
+
+You can also use **`/do:status`** to see where you are and navigate from there.
 
 **Resume routing:**
 
-| STATE.md Next Action | Workflow Triggered |
-| -------------------- | ------------------ |
+| STATE.md Next Action | Action Taken |
+| -------------------- | ------------ |
 | "Research phase XX" | Research workflow |
 | "Plan phase XX" | Plan workflow |
 | "Build phase XX" | Build workflow |
@@ -127,6 +114,7 @@ What happens:
 3. Shows current position
 4. Shows next action
 5. Lists any pending items
+6. Offers navigation options
 
 Output example:
 ```
@@ -164,7 +152,6 @@ STATE.md is updated at every significant transition:
 | Verify starts | Step -> verify, status -> in-progress |
 | Verify complete | Step -> verify, status -> complete or needs-fixes |
 | Phase complete | Status -> complete, next phase queued |
-| Work paused | Status -> paused, full context saved |
 
 ---
 
@@ -194,7 +181,6 @@ If `git.auto_commit` is true in config.json:
 | Phase plan complete | `git add .work/phases/XX/PLAN.md && git commit` |
 | Phase build complete | `git add .work/phases/XX/BUILD.md && git commit` |
 | Phase verify complete | `git add .work/phases/XX/VERIFY.md && git commit` |
-| Work saved | `git add .work/STATE.md .work/PROJECT.md .work/config.json && git commit` |
 
 Always stage specific files - never `git add .work/`.
 
@@ -208,7 +194,7 @@ chore(do): <action> - phase XX <step>
 ## Failure Recovery
 
 ### If Claude Code crashes mid-session
-STATE.md was last updated at the most recent transition. Resume with `/do:resume` - you may need to redo the last step.
+STATE.md was last updated at the most recent transition. Run `/do:start` or `/do:status` — you may need to redo the last step.
 
 ### If a build task fails
 BUILD.md logs the failure. On resume, the system presents options:
@@ -230,7 +216,7 @@ Session behavior is controlled by `.work/config.json`:
   "mode": "interactive",     // "interactive" = confirm at each step
   "fast_mode": false,        // Reduced ceremony when true
   "git": {
-    "auto_commit": false,    // Prompt to commit state changes
+    "auto_commit": false,    // Auto-commit state changes when true
     "use_branches": true,    // Create feature branches per phase
     "conventional_commits": true  // feat:, fix:, chore:, etc.
   }
@@ -250,11 +236,7 @@ Session behavior is controlled by `.work/config.json`:
 - Quick verify (qa + reviewer only)
 - Only stops for git approval and CRITICAL findings
 
-Switch modes:
-```
-/do:settings fast_mode on
-/do:settings fast_mode off
-```
+Switch modes via `/do:settings`.
 
 For the fastest possible execution, use `/do:it "task"` which enables fast mode automatically.
 
@@ -264,7 +246,7 @@ For the fastest possible execution, use `/do:it "task"` which enables fast mode 
 
 1. **Always check `/do:status` when starting a new Claude Code session** - it tells you exactly where you are.
 
-2. **Use `/do:save` (or `/do:pause`) before closing** if you want a clean save point with full context.
+2. **State saves automatically** - you do not need to run any save command before closing. STATE.md is updated throughout execution.
 
 3. **STATE.md is human-readable** - you can edit it directly if the system gets confused about where you are.
 

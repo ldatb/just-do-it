@@ -16,3 +16,6 @@
 
 ### Recommendations
 <!-- What approach to take and why -->
+
+## Decisions
+<!-- User decisions from research phase -->

@@ -1,6 +1,6 @@
 # Just do It - Capabilities
 
-This file describes what the plugin can do. Generated during setup/discover.
+This file describes what the plugin can do. Generated during initialization.
 
 ## Git Integration
 <!-- Fill these from config.json during initialization -->
@@ -16,25 +16,17 @@ This file describes what the plugin can do. Generated during setup/discover.
 <!-- List enabled agents from config.json -->
 
 ## Commands
-- `/do:it` - Just do it. Minimal ceremony, fast execution.
-- `/do:start` - Full pipeline: research, plan, build, verify.
-- `/do:brainstorm` - Explore and refine an idea before building.
-- `/do:research` - Research a topic or technology.
-- `/do:plan` - Plan the current phase.
-- `/do:build` - Execute the current phase's plan.
-- `/do:verify` - Multi-specialist verification.
-- `/do:debug` - Debug an issue with specialist agent.
-- `/do:review` - Code review with specialists.
-- `/do:discover` - Scan codebase, generate agent context.
-- `/do:setup` - Interactive setup for new projects.
-- `/do:status` - Show current phase and next action.
-- `/do:resume` - Continue from where you left off.
-- `/do:save` / `/do:pause` - Save state for later.
-- `/do:settings` - Configure profiles, agents, git, mode.
-- `/do:help` - Show command reference.
+- `/do:start` - Begin or continue a project task
+- `/do:it` - Execute immediately, no ceremony
+- `/do:brainstorm` - Explore an idea before building
+- `/do:debug` - Investigate and fix a bug
+- `/do:review` - Review code with specialists
+- `/do:status` - Show project state and navigate
+- `/do:settings` - Configure project settings
+- `/do:help` - Show command reference
 
 ## Phases
-- **Discover** - Deep codebase scan, generate agent context files
+- **Initialize** - First-run setup and codebase discovery (internal, triggered by start)
 - **Research** - Find prior art, libraries, patterns
 - **Plan** - Create executable task plan
 - **Build** - Specialist agents execute tasks
@@ -46,7 +38,7 @@ This file describes what the plugin can do. Generated during setup/discover.
 - **budget** - Fast and cheap (haiku for most agents)
 
 ## Safety
-- All git operations require user confirmation
+- Git operations follow config settings (auto_commit controls commit behavior)
 - No autonomous mode - user is always in the loop
 - Destructive actions (file deletion, force push) always prompt
 - CRITICAL verification findings block completion

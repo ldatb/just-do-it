@@ -31,7 +31,12 @@ All state lives in `.work/STATE.md`. When a session ends or pauses, STATE.md con
 
 ## Resume Protocol
 
-When `/do:resume` is invoked:
+To resume work, run `/do:start` or `/do:status`:
+
+- `/do:start` — reads STATE.md, displays a context block, and presents navigation options to continue from the last saved position.
+- `/do:status` — reads STATE.md and PROJECT.md, shows current position and phase list, and offers navigation options.
+
+Resume steps:
 1. Read `.work/STATE.md`
 2. Read `.work/PROJECT.md` for project context
 3. Read the current phase directory for phase-specific state
@@ -39,8 +44,10 @@ When `/do:resume` is invoked:
 
 ## Pause Protocol
 
-When `/do:pause` or session ends:
-1. Update STATE.md with current position
-2. Write `Next Action` clearly
-3. List any in-flight work
-4. Commit planning docs if git is available
+State saves automatically — there is no manual pause command. STATE.md is updated at every significant transition during execution. To stop working, simply close Claude Code.
+
+Automatic save behavior:
+1. STATE.md is updated with current position after each significant action
+2. `Next Action` is written clearly so execution can resume from the exact point
+3. In-flight work is listed under `Pending`
+4. If `git.auto_commit` is true in config.json, planning docs are committed automatically

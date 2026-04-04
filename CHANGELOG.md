@@ -4,73 +4,85 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-04-04
+
+### Added
+- KISS/Kodawari/DRY/SOLID quality principles in all 26 agent definitions
+- Mandatory verification loop in do-coder (build -> test -> security -> perf -> fix -> repeat)
+- Quality verification loop in build workflow (security + perf + code review audit after every build, up to 3 iterations)
+- Enterprise/production-readiness requirements for all engineering agents
+- Domain-specific quality standards per agent (zero-trust for security, chaos-ready for reliability, measure-first for perf, contract-first for integrator, zero-downtime for migrator)
+- Professional standards for all business/people/product agents
+
+## [1.0.0] - 2026-04-04
+
+### Breaking Changes
+- Command surface consolidated from 18 to 8 commands: start, it, brainstorm, debug, review, status, settings, help
+- Removed standalone commands: /do:pause, /do:save, /do:resume, /do:discover, /do:setup, /do:plan, /do:build, /do:verify, /do:research
+- /do:start now handles initialization, codebase discovery, setup, and resume
+- /do:status now includes navigation and resume capabilities
+
+### Added
+- Apple UX philosophy: recommendation-led, minimal, no dead ends
+- Every AskUserQuestion has a recommended option marked first
+- All freeform questions replaced with structured single-select options
+- Brainstorm flows directly into start pipeline (no manual command needed)
+- First-run experience: 2-3 focused questions, then work begins
+- Returning user experience: auto-detected context and navigation
+- Transparency: every automated action announced with status line
+- Iterative single-select pattern replaces all "select all that apply" flows
+- "Show details" in verify and debug re-presents options after showing context
+
+### Changed
+- Settings flattened to 2 levels max (was 3 for model_overrides)
+- Verify: "Fix all remaining" removed; each finding is its own decision
+- Templates synced with workflows (Complexity, Decisions, timestamp fields added)
+- Help shows 8-command surface with current project state
+- Status absorbs resume: select "Continue" to pick up where you left off
+
 ## [0.5.0] - 2026-03-28
 
-### Maintenance
+### Added
+- Documentation agent (do-docs) for automatic README/CHANGELOG updates after every build
 
-- chore: spec-driven workflow (5675990)
-- chore: spec-driven workflow (a8d0b97)
-- chore: update CHANGELOG.md for v0.4.0 (dae6f0a)
 ## [0.4.0] - 2026-03-25
 
-### Maintenance
+### Changed
+- Spec-driven workflow improvements
 
-- chore: update CHANGELOG.md for v0.3.0 (e74dd53)
 ## [0.3.0] - 2026-03-19
 
 ### Added
+- Kodawari and KISS design principles
 
-- feat: use kodawari and KISS (0c02d2f)
+### Changed
+- Smarter agent selection based on task classification
+- Decreased context usage for main orchestrator window
+- Granular adjustments to agent dispatch rules
 
-### Documentation
-
-- docs: github repo link (7bad922)
-
-### Maintenance
-
-- chore: granular adjustments (646c9dc)
-- chore: smarter agent selection (49d39c3)
-- chore: decrease context usage for main window (21342c0)
-- chore: update CHANGELOG.md for v0.2.0 (38f10af)
 ## [0.2.0] - 2026-03-13
 
 ### Added
-
-- feat: add 5 new commands, overhaul discovery, fix agent bugs (04fc35a)
+- 5 new commands: /do:it, /do:debug, /do:research, /do:help, /do:pause
+- Overhauled discovery workflow with 6 parallel agents
 
 ### Fixed
-
-- fix: permission errors failing silently (761433f)
-- fix: agents not calling other agents (7f1eccd)
+- Permission errors failing silently in subagents
+- Agents unable to call other agents
 
 ### Changed
+- Settings-driven workflows with mandatory agent dispatch rules
 
-- refactor: settings-driven workflows, mandatory agent dispatch rules (728cbc1)
 ## [0.1.0] - 2026-03-11
 
 ### Added
-
-- 25 specialist agents across 5 departments:
-  - Engineering (11): coder, architect, security, reliability, qa, devops, debugger, perf, integrator, migrator, data
-  - Business (5): strategist, marketer, sales, finance, ops
-  - People and Legal (4): hr, legal, compliance, support
-  - Product and Design (2): product, designer
-  - Cross-Cutting (3): researcher, reviewer, writer
+- Initial release with 25 specialist agents across 5 departments
 - Full execution pipeline: research -> plan -> build -> verify
-- `/do:brainstorm` command for interactive idea exploration before starting
-- `/do:start` command for full pipeline execution
-- `/do:discover` command to scan existing codebases and generate agent context
-- `/do:setup` command for interactive project setup (greenfield)
-- `/do:plan`, `/do:build`, `/do:verify` for individual phase control
-- `/do:review` for multi-specialist code review
-- `/do:status`, `/do:resume`, `/do:save` for session management
-- `/do:settings` for configuration (model profiles, fast mode, git, agents)
-- Context layering system: base agent + project.md + department.md + agent-specific.md
-- Model profiles: quality (opus), balanced (sonnet), budget (haiku)
-- Per-agent model overrides in `.work/config.json`
-- Fast mode for reduced ceremony on well-understood work
-- Git workflow with conventional commits (branches and messages)
-- All git operations require explicit user approval
-- Session continuity via `.work/STATE.md`
+- Brainstorm, start, discover, setup, plan, build, verify commands
+- Review, status, resume, save, settings commands
+- Context layering system (base + project + department + agent-specific)
+- Model profiles: quality, balanced, budget
+- Fast mode for reduced ceremony
+- Git workflow with conventional commits
+- Session continuity via STATE.md
 - Install and uninstall scripts
-- Full documentation in `docs/`

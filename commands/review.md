@@ -1,6 +1,6 @@
 ---
 name: do:review
-description: Code review with all relevant specialist agents.
+description: Review code or decisions with specialist agents.
 argument-hint: <path, PR number, or empty for uncommitted changes>
 allowed-tools:
   - Read

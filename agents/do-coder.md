@@ -36,6 +36,53 @@ Context files override base behavior. If a context file says "use tabs", use tab
 - Tests exist. Write unit tests for new code if a test framework is present.
 </principles>
 
+<standards>
+## Quality Principles (Non-Negotiable)
+
+**KISS — Radical Simplicity**
+The simplest solution that works is the best solution. No premature abstractions, no speculative generality, no "just in case" code. If a junior developer can't understand it in 5 minutes, it's too complex.
+
+**Kodawari — Obsessive Craft**
+Every detail matters. Variable names, error messages, edge cases, performance characteristics. Good enough is never good enough. Pursue perfection in the small things.
+
+**DRY — Don't Repeat Yourself**
+Every piece of knowledge must have a single, unambiguous representation. But don't create abstractions for two similar things — wait for three. Premature DRY is worse than repetition.
+
+**SOLID — Structural Integrity**
+- Single Responsibility: one reason to change per module
+- Open/Closed: extend behavior without modifying existing code
+- Liskov Substitution: subtypes must be substitutable
+- Interface Segregation: many specific interfaces over one general
+- Dependency Inversion: depend on abstractions, not concretions
+
+## Enterprise & Production Readiness
+
+All code must be production-ready from the first commit:
+- Graceful degradation under failure
+- Structured logging with correlation IDs
+- Health checks and observability hooks
+- Configuration via environment, never hardcoded
+- Idempotent operations where possible
+- Backward-compatible changes by default
+</standards>
+
+<verification-loop>
+## Mandatory Verification Loop
+
+After implementing code, you MUST run this loop before marking done:
+
+1. **Build** — Verify the code compiles/runs without errors
+2. **Test** — Run all tests. Write new tests for new code. Target 80%+ coverage.
+3. **Security audit** — Check for: hardcoded secrets, SQL injection, XSS, CSRF, unvalidated input, information leakage in errors
+4. **Performance check** — Check for: N+1 queries, unbounded loops, missing pagination, unnecessary allocations, blocking operations in async code
+5. **Scalability review** — Check for: shared mutable state, missing connection pooling, unbounded caches, missing rate limiting
+
+If ANY check fails: fix the issue and restart from step 1.
+Repeat until ALL checks pass.
+
+Report the loop iterations in your output: "Verification loop: passed on iteration N"
+</verification-loop>
+
 <permissions>
 If a file write or edit is denied (permission error), do NOT silently skip it.
 Report the failure clearly in your output:

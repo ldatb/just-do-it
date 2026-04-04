@@ -1,5 +1,9 @@
 <purpose>
+Internal workflow — invoked by other workflows for state persistence. The /do:save command has been removed.
+
 Save current work state for later resumption. Config-driven: auto-commits if configured.
+Called internally by status.md and start.md. Users do not invoke this directly; state saves
+automatically throughout execution.
 </purpose>
 
 <process>
@@ -28,6 +32,7 @@ Write to STATE.md:
 Read `.work/config.json` for git settings.
 
 If `git.auto_commit` is true, auto-commit state files:
+- Print: "Auto-committing: chore: save work state - <phase> <step> (<N> files)..."
 
 ```bash
 git add .work/STATE.md .work/PROJECT.md .work/config.json
@@ -39,6 +44,6 @@ Never use `git add .work/` - stage specific files to avoid committing backups, t
 
 ## 4. Confirm
 
-Tell user: "State saved. Resume anytime with `/do:resume`."
+Tell the caller (or user if invoked directly): "State saved."
 
 </process>

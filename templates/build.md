@@ -3,10 +3,16 @@
 ## Execution Log
 
 ### Wave 1
-<!-- Agents dispatched and results -->
+- **Started:** <!-- ISO timestamp -->
+- **Agents:** <!-- agent: model pairs -->
+- **Duration:** <!-- time taken -->
+<!-- Results -->
 
 ### Wave 2
-<!-- Agents dispatched and results -->
+- **Started:** <!-- ISO timestamp -->
+- **Agents:** <!-- agent: model pairs -->
+- **Duration:** <!-- time taken -->
+<!-- Results -->
 
 ## Decisions Made
 <!-- Any decisions made during execution -->

@@ -1,6 +1,6 @@
 ---
 name: do:it
-description: Just do it. Skip ceremony, execute fast. For well-understood tasks.
+description: Execute immediately with no ceremony.
 argument-hint: <what to do>
 allowed-tools:
   - Read

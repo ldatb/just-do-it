@@ -1,6 +1,6 @@
 ---
 name: do:debug
-description: Debug an issue with the debugger specialist agent.
+description: Investigate and fix a specific issue.
 argument-hint: <description of the bug or error>
 allowed-tools:
   - Read

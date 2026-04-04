@@ -2,7 +2,8 @@
 Interactive brainstorming session - explore ideas, identify requirements, consider alternatives,
 and refine scope before committing to the full pipeline.
 
-This runs BEFORE research/plan/build/verify. The output is a clear description ready for /do:start.
+This runs BEFORE research/plan/build/verify. The output is a clear description ready for the
+start pipeline, which is triggered directly when the user is ready - no manual command needed.
 
 The brainstorm should feel like talking to a smart colleague - conversational but structured.
 </purpose>
@@ -20,9 +21,9 @@ Use AskUserQuestion:
 - header: "Brainstorm"
 - question: "What are you thinking about building or working on? Can be vague - we'll refine it together."
 - options:
-  - "Let me describe it" - user will type a description
+  - "Let me describe it (Recommended)" - I'll type a description of what I want to build
   - "I have a problem to solve" - start from the problem, not the solution
-  - "I want to explore a technology" - start from a tool/framework/pattern
+  - "I want to explore a technology" - start from a tool, framework, or pattern
   - "I have a rough idea" - half-formed thought to flesh out
 
 Based on the user's response, form an initial understanding and proceed to the exploration loop.
@@ -43,23 +44,18 @@ This is the core of the brainstorm. Iterate through rounds of conversation. Each
    - "What's your timeline?" (urgency)
    - "What tech constraints exist?" (stack/infra)
 
-3. **Offer options** - Always end with selectable choices.
+3. **Offer options** - Always end with selectable choices. Maximum 4 authored options.
 
 Use AskUserQuestion:
 - header: "Brainstorm"
 - question: "[Your clarifying question]"
 - options:
-  - "[Specific answer A]" - brief context
+  - "[Specific answer A] (Recommended)" - brief context based on what you'd suggest
   - "[Specific answer B]" - brief context
-  - "[Specific answer C]" - brief context (if applicable)
-  - "Something else" - user types their own answer
-  - "Explore this further" - dig deeper into the current topic
-  - "Consider alternatives" - look at different approaches
-  - "Narrow scope" - cut features, simplify
-  - "I'm ready - start building" - done brainstorming, proceed to /do:start
-  - "Save brainstorm notes" - save progress without starting
+  - "[Specific answer C]" - brief context
+  - "Something else" - I'll describe a different direction
 
-The specific answer options (A, B, C) should be contextual - real suggestions based on the conversation so far. Do not use generic placeholders. Think about what a knowledgeable colleague would suggest.
+The specific answer options should be contextual - real suggestions based on the conversation so far. Do not use generic placeholders. Think about what a knowledgeable colleague would suggest. Mark the answer you would recommend first with (Recommended).
 
 **Guidelines for the exploration loop:**
 - Keep each round short. One question, one reflection, options.
@@ -84,12 +80,10 @@ Use AskUserQuestion:
 - header: "Proposed Approach"
 - question: "Here's what I'd suggest. Thoughts?"
 - options:
-  - "Looks good - let's go with this" - proceed to save and start
-  - "Modify the approach" - adjust specifics
-  - "Too big - simplify" - reduce scope
-  - "Too small - expand" - add more
-  - "Different direction entirely" - pivot
-  - "Save brainstorm notes" - save without starting
+  - "Looks good - let's go with this (Recommended)" - proceed to save and start
+  - "Modify the approach" - adjust specific aspects
+  - "Too big - simplify" - reduce scope before starting
+  - "Different direction entirely" - pivot and keep exploring
 
 If the user modifies, loop back to step 2 with the refined understanding.
 
@@ -151,16 +145,23 @@ After saving:
 
 Use AskUserQuestion:
 - header: "Brainstorm Complete"
-- question: "Brainstorm notes saved. What next?"
+- question: "Brainstorm saved to .work/phases/XX-<name>/BRAINSTORM.md. What next?"
 - options:
-  - "Start building" - run /do:start with the refined description
-  - "Done for now" - save and stop
-  - "Keep brainstorming" - go back to the exploration loop
+  - "Start building now (Recommended)" - invoke start pipeline with the refined description
+  - "Keep brainstorming" - return to exploration; refine scope or explore alternatives
+  - "Done for now" - save and stop; return with /do:start when ready
 
-If the user chooses "Start building":
-- Compose a clear, refined description from the brainstorm summary
-- Tell the user to run `/do:start "<refined description>"` with the exact command they should use
-- The refined description should be a single sentence capturing the agreed scope
+If the user chooses "Start building now":
+1. Compose the refined description from the brainstorm summary (one sentence capturing agreed scope).
+2. Print: "Starting pipeline with: <refined description>"
+3. Invoke the start workflow directly, passing the refined description as $ARGUMENTS.
+   Do NOT tell the user to type a command. Execute immediately.
+
+If the user chooses "Keep brainstorming":
+- Return to the exploration loop (step 2) with the current understanding intact.
+
+If the user chooses "Done for now":
+- Confirm the save path and stop. The user can run /do:start when ready.
 
 </process>
 
@@ -173,12 +174,13 @@ If the user chooses "Start building":
 - Do not research or plan during brainstorm. That comes later in the pipeline.
 - The brainstorm can be short (2-3 rounds) or long (10+ rounds). Follow the user's lead.
 - If the user already knows exactly what they want, skip to step 3 quickly.
+- Maximum 4 options per AskUserQuestion. Mark the recommended choice first.
 </guidelines>
 
 <warning>
 This is a brainstorming session, not a planning session. Do not:
-- Create detailed implementation plans (that's /do:plan)
-- Write code or pseudocode (that's /do:build)
+- Create detailed implementation plans (that's the plan phase)
+- Write code or pseudocode (that's the build phase)
 - Research libraries or tools in depth (that's the research phase)
 - Create file structures or architecture diagrams (that's the plan phase)
 

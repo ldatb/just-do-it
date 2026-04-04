@@ -3,6 +3,12 @@
 ## Goal
 <!-- One sentence: what this phase delivers -->
 
+## Complexity
+<!-- trivial / simple / standard / complex -->
+
+## Decisions
+<!-- Key decisions from research and planning -->
+
 ## Requirements Covered
 <!-- REQ-IDs this plan addresses -->
 

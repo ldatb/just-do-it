@@ -1,6 +1,9 @@
 <purpose>
-Interactive setup for a new or existing project. Gather information from the user
-to generate project-specific context files that customize agent behavior.
+Internal workflow — invoked by start.md for greenfield projects. The /do:setup command has been removed.
+
+Greenfield project setup. Gather structured context from the user to generate project-specific
+context files that customize agent behavior. Maximum 4 questions total - no freeform prose.
+Triggered automatically by start.md on first run when no existing codebase is detected.
 </purpose>
 
 <process>
@@ -9,100 +12,87 @@ to generate project-specific context files that customize agent behavior.
 
 Check if `.work/` exists. If not, create it with default config.
 Create `.work/context/` directory.
+Auto-detect whether code exists in the current directory (beyond `.git` and dotfiles).
+If code exists, this is a brownfield project - use discover workflow instead. Setup is for greenfield only.
 
-## 2. Project Basics
+## 2. Project Type
 
-Ask the user:
+Use AskUserQuestion:
+- header: "Setup: Project Type"
+- question: "What kind of project is this?"
+- options:
+  - "Engineering - building software (Recommended)" - code, APIs, infrastructure
+  - "Business - strategy, marketing, operations" - planning, content, process
+  - "Mixed - code plus business context" - product and engineering combined
 
-**"What are you building?"**
-- Project name
-- One-sentence description
-- Core value / the ONE thing that must work
+## 3. Tech Stack (only if engineering or mixed)
 
-**"What's the current state?"**
-- Greenfield (starting from scratch)
-- Brownfield (existing codebase) - suggest `/do:discover` for automatic analysis
-- Non-code (business, marketing, ops, etc.)
+Use AskUserQuestion:
+- header: "Setup: Stack"
+- question: "What's the primary tech stack?"
+- options:
+  - "I'll describe it in the task (Recommended)" - no preset; agents infer from your description
+  - "Node.js / TypeScript" - JavaScript ecosystem
+  - "Python" - Python ecosystem
+  - "Go" - Go ecosystem
 
-## 3. Domain-Specific Questions
+## 4. Quality Bar
 
-Based on the project type, ask targeted questions:
-
-### If Engineering Project:
-- Tech stack (language, framework, database)
-- Architecture (monolith, microservices, serverless)
-- Deployment target (cloud provider, platform)
-- Auth approach (if applicable)
-- Existing conventions or style guide
-- Testing framework preference
-- CI/CD setup (or desired)
-
-### If Business Project:
-- Industry and market
-- Target audience
-- Key competitors
-- Current stage (idea, MVP, growth, mature)
-- Team size and structure
-- Existing tools and processes
-
-### If Mixed (code + business):
-Ask both sets, keeping it concise.
-
-## 4. Constraints & Preferences
-
-Ask:
-- **Timeline:** Any deadlines?
-- **Budget:** Cost sensitivity for model profiles?
-- **Quality bar:** What's the standard? (startup-speed vs enterprise-grade)
-- **Preferences:** Anything specific about how you like to work?
+Use AskUserQuestion:
+- header: "Setup: Quality"
+- question: "What quality bar should agents target?"
+- options:
+  - "Production-ready (Recommended)" - thorough testing, security checks, proper error handling
+  - "MVP / prototype" - fast iteration, lower ceremony, skip exhaustive verification
+  - "Exploratory" - spike or experiment; output is throwaway code
 
 ## 5. Generate Context Files
 
 From the answers, generate:
 
 ### .work/context/project.md
-- Project name, description, core value
-- Tech stack (if applicable)
-- Target audience
-- Key constraints
+- Project name and description (from $ARGUMENTS or inferred)
+- Project type
 - Quality bar
+- Key constraints
 
-### .work/context/engineering.md (if engineering project)
-- Stack details and versions
-- Architecture decisions
-- Conventions to follow
-- Testing approach
-- Deploy target
+### .work/context/engineering.md (if engineering or mixed)
+- Stack details from answers
+- Quality and testing expectations
+- Conventions to follow (defaults until discovery reveals specifics)
 
-### .work/context/business.md (if business project)
-- Industry context
-- Competitive landscape
-- Target audience profile
-- Current stage and goals
+### .work/context/business.md (if business or mixed)
+- Industry context (if provided)
+- Project goals
+- Target audience (if known)
 
-### Department/agent-specific files as warranted by the answers.
+Print: `Generating context files from setup answers...`
 
 ## 6. Generate PROJECT.md
 
-Create `.work/PROJECT.md` from the setup answers:
+Create `.work/PROJECT.md`:
 - What This Is
-- Core Value
-- Requirements (initial, from discussion)
-- Constraints
-- Key Decisions
+- Core Value (inferred from $ARGUMENTS)
+- Constraints (from quality bar and stack choices)
+- Key Decisions (from setup answers)
 
-## 7. Configure Settings
+## 7. Config Suggestions
 
-Based on answers, suggest config.json adjustments as individual options:
+Based on answers, determine suggested config.json adjustments.
+
+Present using an iterative single-select loop. Do NOT ask the user to "select all that apply."
 
 Use AskUserQuestion:
-- header: "Setup: Config"
-- question: "Suggested settings based on your answers: (select all that apply)"
-- options: one per suggestion, each showing the setting and why. Examples:
-  - "model_profile: balanced → quality" - enterprise-grade quality bar
-  - "model_overrides.security: → opus" - auth-heavy project
-  - "fast_mode: false → true" - prototype/MVP pace
-  - "Done" - apply selected and continue
+- header: "Config: Recommendations"
+- question: "Setup found <N> recommended settings. Apply one, or select Done when finished."
+- options:
+  - "<setting>: <current> -> <recommended> (Recommended)" - <one-sentence rationale>
+  - "<setting>: <current> -> <recommended>" - <one-sentence rationale>
+  - "Done" - proceed without further changes
+
+After each selection (except "Done"): apply the change to config.json immediately, print the updated value, then re-present the menu with that option removed.
+
+If no suggestions exist, skip this step.
 
 ## 8. Present Summary
 
@@ -112,19 +102,20 @@ Show what was generated:
 
 Use AskUserQuestion:
 - header: "Setup Complete"
-- question: "Files generated. What to review?"
-- options: one per generated file, plus:
+- question: "<N> context files generated. What would you like to review?"
+- options:
+  - "Looks good, proceed (Recommended)" - accept and move on to pipeline
   - "Review project.md" - check project overview
   - "Review engineering.md" - check engineering context (if generated)
   - "Review business.md" - check business context (if generated)
-  - "Review config.json" - check settings
-  - "Looks good, proceed" - accept and move on
+
+When user selects a review option: display the requested file, then re-present the identical AskUserQuestion.
 
 ## 9. Update State
 
 Update STATE.md:
 - Status: setup-complete
 - Last Action: Project setup complete
-- Next Action: Ready - use `/do:start` to begin
+- Next Action: Ready for pipeline
 
 </process>
