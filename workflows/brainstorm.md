@@ -175,6 +175,7 @@ If the user chooses "Done for now":
 - The brainstorm can be short (2-3 rounds) or long (10+ rounds). Follow the user's lead.
 - If the user already knows exactly what they want, skip to step 3 quickly.
 - Maximum 4 options per AskUserQuestion. Mark the recommended choice first.
+- **UX always wins — never ask.** When options differ only in "easier to build" vs "better UX", pick the higher-UX option yourself and move on. Don't pose it as a choice. Apple user-centric philosophy is non-negotiable — surface a choice only when the tradeoff is cost, security, architectural lock-in, or irreversibility.
 </guidelines>
 
 <warning>

@@ -103,6 +103,7 @@ After compiling findings, analyze them and identify:
 - Only ask about decisions that genuinely affect the outcome
 - Always mark the first option with (Recommended)
 - After getting answers, save decisions to RESEARCH.md under `## Decisions`
+- **UX always wins — never ask.** If the only meaningful tradeoff between two options is "easier to build" vs "better user experience", silently pick the better-UX option and record it under `## Decisions`. Apple's user-centric philosophy is non-negotiable here. Surface a choice only when the tradeoff is genuinely ambiguous (cost, security, architectural lock-in, irreversibility) — not when it's "harder but nicer". Phrase the plan as "Implementing X (the better-UX approach)" without enumerating the inferior alternative.
 
 ## 5. Update State
 

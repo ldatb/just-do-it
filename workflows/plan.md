@@ -143,6 +143,8 @@ For each decision, use AskUserQuestion:
 
 Keep to 2-4 decision questions max. Don't ask about things already decided in research.
 
+**UX always wins — never ask.** If two implementation approaches differ mainly in "easier to build" vs "better user experience" (fewer clicks, no redirects, less friction, more polish), silently choose the higher-UX path and note it under `## Decisions`. Apple's user-centric philosophy is non-negotiable. Only surface a choice when the tradeoff is genuinely ambiguous — cost, security, architectural lock-in, irreversibility — not when it's "harder but nicer".
+
 ## 6. Create PLAN.md
 
 Write `PLAN.md` in the phase directory, incorporating user decisions from steps 4b and 5:
