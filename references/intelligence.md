@@ -76,10 +76,20 @@ Not every task needs the full agent roster. Classify task complexity before sele
 
 | Level | Criteria | Agent Strategy |
 | ----- | -------- | -------------- |
-| **trivial** | Single file, < 50 lines changed, no new dependencies, no security surface | `do-coder` only. Skip verify agents — run linter/tests directly. |
-| **simple** | 1-3 files, single concern, no architecture decisions | `do-coder` + `do-qa` + `do-reviewer`. Skip design wave. |
+| **trivial** | Single file, < 50 lines changed, no new dependencies, no security surface | `do-coder` only. **Skip research, design, docs, AND verify waves.** Run linter/tests directly via Bash if available. |
+| **simple** | 1-3 files, single concern, no architecture decisions | `do-coder` + `do-reviewer`. **Skip research wave, skip design wave, skip `do-docs` unless README is affected, skip `do-qa` (reviewer covers style + obvious test gaps).** |
 | **standard** | Multi-file, may involve architecture or security | Full dispatch per agent-roster.md rules. |
 | **complex** | Cross-cutting, multiple domains, new system boundaries | Full dispatch + consider quality model profile. |
+
+### Enforcement (not optional)
+
+Workflows MUST gate wave execution on complexity. The orchestrator reads PLAN.md's `## Complexity` line and skips waves accordingly:
+
+- **trivial**: run Wave 2 (coder) only. No Wave 1, no docs, no Verify. Commit directly. Done.
+- **simple**: run Wave 2 (coder), then single-agent Verify (`do-reviewer` only). Skip docs if no user-facing code or README touched.
+- **standard / complex**: run every wave per plan.
+
+Every skipped wave must be announced to the user with the reason: `Skipping Verify wave (complexity: trivial).` Silent skips are forbidden.
 
 ### Classification Rules
 

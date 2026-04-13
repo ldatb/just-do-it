@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **UX always wins principle**: Workflows (research, plan, brainstorm) now silently pick the higher-UX option when the only tradeoff is "easier to build" vs "better UX" — no more asking the user to choose between UX tiers.
+- **Discovery cache**: `/do:discover` now skips regeneration when `.work/context/` is fresh (< 30 days, < 50 commits since last run). Cache metadata written to `.work/context/.cache-meta.json`. Pass `--force` to regenerate.
+- **Cost-aware wave gating**: `start.md` and `go.md` now skip Design / Docs / Verify waves based on PLAN.md complexity classification. Trivial tasks run coder only; simple tasks run coder + reviewer. Enforced, not advisory.
+
+### Changed
+- **Model profile — `balanced`**: `do-reviewer`, `do-qa`, `do-researcher`, `do-docs`, and `do-devops` downshifted from Sonnet to Haiku 4.5 (~3× cheaper, ~90% quality on pattern-matching work). Override via `model_overrides` for projects needing higher rigor.
+- **Agent dispatch**: Build prompts now instruct agents to prefer cached `.work/context/` files over Glob/Grep'ing the whole repo, eliminating redundant codebase rediscovery on every wave.
+
 ## [1.0.0] - 2026-04-04
 
 ### Added

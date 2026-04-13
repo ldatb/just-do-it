@@ -170,6 +170,11 @@ Use AskUserQuestion:
 
 Print: `Building...`
 
+**Respect PLAN.md `## Complexity` line** (see `references/intelligence.md` § Cost-Aware Routing):
+- **trivial**: dispatch `do-coder` only. Skip Wave 1 entirely. After coder finishes, jump to Step 9 (Complete). Announce: `Skipping Docs + Verify waves (complexity: trivial).`
+- **simple**: dispatch `do-coder` (no design wave). Announce: `Skipping Design wave (complexity: simple).`
+- **standard / complex**: run all waves per plan.
+
 **Follow `build.md` exactly.** Key rules:
 - Pass file PATHS to agents, not contents
 - Dispatch via Agent tool in parallel (up to max_concurrent)
@@ -183,24 +188,30 @@ Git commits per config:
 - If `git.auto_commit` is true: print `Auto-committing: <type>: <description> (<N> files)...` then commit.
 - If false: ask user before committing.
 
-## 7. Documentation Update (MANDATORY)
+## 7. Documentation Update
 
-Print: `Dispatching do-docs to update project documentation. (Always runs after build.)`
+**Respect complexity classification:**
+- **trivial**: skip entirely. Announce: `Skipping Docs (complexity: trivial).`
+- **simple**: skip unless README, public API, or user-facing surface was modified. Announce the skip or the dispatch explicitly.
+- **standard / complex**: always dispatch `do-docs`.
 
-ALWAYS dispatch `do-docs` to update project documentation.
-Pass it the phase PLAN.md, BUILD.md, and the list of modified files.
-This step is never skipped, even in fast mode.
+Print: `Dispatching do-docs to update project documentation.`
+
+Dispatch `do-docs` with the phase PLAN.md, BUILD.md, and the list of modified files.
 
 ## 8. Verify
 
-Print: `Verifying...`
+**Respect complexity classification:**
+- **trivial**: skip the entire Verify wave. Announce: `Skipping Verify (complexity: trivial).` Run any available linter/test command via Bash as a sanity check instead.
+- **simple**: dispatch `do-reviewer` only (covers style + obvious test gaps). Skip `do-qa` and all specialists.
+- **standard (fast mode)**: dispatch `do-qa` + `do-reviewer` only.
+- **standard / complex (normal mode)**: dispatch all relevant specialists based on files modified:
+  - `do-qa` + `do-reviewer` (always)
+  - `do-security` (if auth/crypto/input touched)
+  - `do-reliability` (if error handling/data touched)
+  - `do-devops` (if infra touched)
 
-**Fast mode:** Dispatch `do-qa` + `do-reviewer` only.
-**Normal mode:** Dispatch all relevant specialists based on files modified:
-- `do-qa` + `do-reviewer` (always)
-- `do-security` (if auth/crypto/input touched)
-- `do-reliability` (if error handling/data touched)
-- `do-devops` (if infra touched)
+Print: `Verifying...`
 
 Compile into phase `VERIFY.md`.
 

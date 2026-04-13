@@ -16,37 +16,58 @@ If existing code: quick single-agent discovery (stack + structure only). If gree
 
 Create `.work/phases/XX-<name>/` from $ARGUMENTS. No prompt.
 
-## 3. Research
+## 3. Classify Complexity
 
-Dispatch one `do-researcher`: "Top 2-3 things to know before implementing: $ARGUMENTS."
+Classify $ARGUMENTS per `references/intelligence.md` § Cost-Aware Routing:
+- **trivial**: single file, <50 lines changed, no risk surface
+- **simple**: 1-3 files, single concern, no architecture decisions
+- **standard / complex**: multi-file, architecture, or any risk surface (auth/data/money/external systems)
+
+Any risk surface = at least **standard**. Note the classification — it gates every wave below.
+
+## 4. Research
+
+**Skip entirely if trivial or simple.** Go straight to Plan.
+
+Otherwise dispatch one `do-researcher`: "Top 2-3 things to know before implementing: $ARGUMENTS."
 Write brief RESEARCH.md. Do NOT ask user to review. Proceed immediately.
 
-## 4. Plan
+## 5. Plan
 
-Create single-wave PLAN.md: goal (one sentence), tasks (minimal list), agent per task.
+Create single-wave PLAN.md: goal (one sentence), **complexity classification**, tasks (minimal list), agent per task.
 Show brief summary in output. Do NOT ask for approval. Proceed immediately.
 
-## 5. Build
+## 6. Build
 
 If `git.use_branches` is true:
 - Print: "Creating branch feat/<phase-name>..."
 - Create the branch.
 
-Dispatch all task agents in parallel (respecting max_concurrent). Compile BUILD.md.
+**Respect complexity:**
+- **trivial**: dispatch `do-coder` only.
+- **simple / standard / complex**: dispatch task agents per PLAN.md in parallel (respecting max_concurrent).
+
+Compile BUILD.md.
 
 If code modified:
 - If `git.auto_commit` is true: print `Auto-committing: <type>: <description> (<N> files)...` then auto-commit with conventional message.
 - If `git.auto_commit` is false: ask user before committing.
 
-## 6. Documentation Update (MANDATORY)
+## 7. Documentation Update
 
-Print: "Dispatching do-docs to update project documentation. (Always runs after build.)"
-Dispatch `do-docs` with phase PLAN.md, BUILD.md, and modified file list.
-Never skipped, even in fast/go mode.
+**Respect complexity:**
+- **trivial**: skip. Announce: `Skipping Docs (complexity: trivial).`
+- **simple**: skip unless README/public API/user-facing surface was touched.
+- **standard / complex**: always dispatch `do-docs` with phase PLAN.md, BUILD.md, and modified file list.
 
-## 7. Verify
+Print: `Dispatching do-docs to update project documentation.` (when running)
 
-Dispatch `do-qa` + `do-reviewer` only.
+## 8. Verify
+
+**Respect complexity:**
+- **trivial**: skip entirely. Announce: `Skipping Verify (complexity: trivial).` Run `make test` / `npm test` / language-appropriate test command via Bash as a sanity check if one is obvious.
+- **simple**: dispatch `do-reviewer` only.
+- **standard / complex**: dispatch `do-qa` + `do-reviewer` only (fast mode).
 
 For each CRITICAL finding:
 
@@ -59,7 +80,7 @@ Use AskUserQuestion:
 
 Otherwise: done.
 
-## 8. Done
+## 9. Done
 
 Update STATE.md. Print: "Done: [what was built]. [N files modified]."
 

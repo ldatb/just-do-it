@@ -20,6 +20,38 @@ Discovery generates:
 Check if `.work/` exists. If not, create it.
 Create `.work/context/` directory.
 
+### Cache check (skip discovery if context is fresh)
+
+Before doing anything else, check whether discovery can be skipped:
+
+1. Does `.work/context/project.md` exist AND is it non-empty?
+2. Does `.work/context/engineering.md` exist AND is it non-empty?
+3. Is the newest file in `.work/context/` less than 30 days old?
+4. Has the codebase's git HEAD moved fewer than 50 commits since the context was generated? (Check `.work/context/.cache-meta.json` → `head_at_discovery` if it exists; if not, skip this check.)
+
+If ALL four conditions are true: **skip discovery entirely.** Print:
+
+```
+Cached context is fresh (<age> old, <N> context files). Skipping discovery.
+Re-run with /do:discover --force to regenerate.
+```
+
+Then jump to Step 8 (Update State) and return. Do NOT dispatch discovery agents.
+
+If any condition fails OR the caller passed `--force`, proceed with full discovery below.
+
+After a successful discovery run (Step 8), write `.work/context/.cache-meta.json`:
+
+```json
+{
+  "generated_at": "<ISO-8601 timestamp>",
+  "head_at_discovery": "<git rev-parse HEAD output>",
+  "files": [<list of generated context files>]
+}
+```
+
+This is the freshness proof that future Pre-flight checks read.
+
 **If `.work/config.json` does not exist:**
 Copy the config template from the plugin's `templates/config.json`. This ensures ALL required
 fields exist with defaults. The template schema is the single source of truth for config structure.

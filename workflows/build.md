@@ -37,6 +37,12 @@ Read these files before starting:
 - [list of context file PATHS]
 - [phase PLAN.md path]
 
+IMPORTANT: These context files are the authoritative cached summary of the
+codebase. Prefer them over Glob/Grep'ing the whole repo. Only read additional
+source files when the task explicitly targets them or the context files leave
+a specific question unanswered. Do NOT re-discover the tech stack, structure,
+or conventions — that's what the context files are for.
+
 Your task from the plan:
 [specific task section]
 
