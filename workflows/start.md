@@ -215,20 +215,13 @@ Print: `Verifying...`
 
 Compile into phase `VERIFY.md`.
 
-For each CRITICAL or HIGH finding:
+Run the auto-fix loop from `workflows/verify.md` §6: dispatch `do-coder` to fix all CRITICAL + HIGH in one pass, re-dispatch specialists, re-apply consensus, loop up to `verify.auto_fix.max_iterations` (default 3). No per-finding prompts.
 
-Use AskUserQuestion:
-- header: "<Severity>: <finding title>"
-- question: "<One sentence: what is wrong, where, which agent found it>"
-- options:
-  - "Fix now (Recommended)" - dispatch agent to fix this specific issue immediately
-  - "Show details" - see full finding with file path, line number, and code context
-  - "Fix later" - acknowledge and defer; recorded in VERIFY.md as deferred
-  - "Not an issue" - override; you will provide justification recorded in VERIFY.md
+MEDIUM and LOW findings: always logged to VERIFY.md, never prompted.
 
-When user selects "Show details": display the full finding, then re-present the identical AskUserQuestion.
-
-For MEDIUM findings, use the same structure but "Fix later (Recommended)" as the first option.
+Loop exit paths:
+- **All CRITICAL + HIGH cleared:** proceed to §9.
+- **Loop exhausted, blockers remain:** present the single summary AskUserQuestion from `verify.md` §6 (Show findings and stop / Run N more iterations / Accept remaining and proceed).
 
 ## 9. Complete
 

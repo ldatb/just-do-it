@@ -9,5 +9,11 @@
     "auto_commit": false,
     "use_branches": true,
     "conventional_commits": true
+  },
+  "verify": {
+    "auto_fix": {
+      "enabled": true,
+      "max_iterations": 3
+    }
   }
 }

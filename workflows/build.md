@@ -130,6 +130,9 @@ This step is NOT optional. Every build must end with a docs update, even in fast
 ## 3.5. Quality Verification Loop (Code Changes Only)
 
 Skip this step if no application code was modified (docs-only, config-only changes skip).
+Skip this step entirely if `verify.auto_fix.enabled` is false in `.work/config.json`.
+
+Read `verify.auto_fix.max_iterations` from config (default 3).
 
 After build waves and docs update complete, run a verification loop:
 
@@ -141,16 +144,18 @@ After build waves and docs update complete, run a verification loop:
 2. **Compile findings.** Merge by severity using consensus rules from `references/intelligence.md`.
 
 3. **If CRITICAL or HIGH findings exist:**
-   - Dispatch `do-coder` to fix all CRITICAL and HIGH issues
+   - Dispatch `do-coder` to fix all CRITICAL and HIGH issues in one pass
    - After fixes: return to step 1 (re-audit)
-   - Maximum 3 iterations. If still failing after 3: stop and present findings to user.
+   - Maximum `verify.auto_fix.max_iterations` iterations. If still failing after cap: stop and present the single summary AskUserQuestion from `verify.md` §6 (Show findings and stop / Run N more iterations / Accept remaining and proceed).
 
 4. **If only MEDIUM/LOW or no findings:** Proceed to results.
 
 Print status line before each iteration:
 ```
-Quality audit: iteration N of 3...
+Quality audit: iteration N of <max>...
 ```
+
+No per-finding prompts. MEDIUM and LOW are logged to BUILD.md, never surfaced interactively.
 
 This loop ensures every code change ships with security, performance, and quality validation built in.
 

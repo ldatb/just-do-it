@@ -13,11 +13,13 @@ Read `.work/config.json`. If `.work/` doesn't exist: error — no project initia
 Display current config values:
 
 ```
-model_profile:               [value]
-fast_mode:                   [value]
-git.use_branches:            [value]
-git.auto_commit:             [value]
-parallelization.max_concurrent: [value]
+model_profile:                      [value]
+fast_mode:                          [value]
+git.use_branches:                   [value]
+git.auto_commit:                    [value]
+verify.auto_fix.enabled:            [value]
+verify.auto_fix.max_iterations:     [value]
+parallelization.max_concurrent:     [value]
 ```
 
 If any model_overrides exist, list each one:
@@ -36,6 +38,7 @@ Use AskUserQuestion:
   - "model_profile: [current]" - cycle to next: balanced -> quality -> budget -> balanced
   - "fast_mode: [current]" - toggle to: [opposite]
   - "Git settings" - configure use_branches, auto_commit, and conventional_commits
+  - "Verify settings" - configure auto_fix loop (enabled, max_iterations)
   - "Agent model overrides" - add or remove model overrides per agent
   - "Done" - save and exit settings
 
@@ -79,6 +82,27 @@ When the user selects a toggle: apply to config.json immediately, print the upda
 When the user selects "Done": return to Level 1 menu.
 
 This is the final level for git settings. There is no Level 3.
+
+### Verify settings (Level 2)
+
+Display current verify config values:
+```
+verify.auto_fix.enabled:        [value]
+verify.auto_fix.max_iterations: [value]
+```
+
+Use AskUserQuestion:
+- header: "Settings: Verify"
+- question: "Select a verify setting to change, or Done to return."
+- options:
+  - "verify.auto_fix.enabled: [current]" - toggle to: [opposite]; auto-dispatch do-coder to fix CRITICAL/HIGH findings in a loop
+  - "verify.auto_fix.max_iterations: [current]" - cycle through 1 -> 3 -> 5 -> 10 -> 1; cap on auto-fix loop iterations
+  - "Done" - return to main settings menu
+
+When the user selects a toggle or cycle: apply to config.json immediately, print the updated value, re-present this Level 2 menu.
+When the user selects "Done": return to Level 1 menu.
+
+This is the final level for verify settings. There is no Level 3.
 
 ### Agent model overrides (Level 2)
 

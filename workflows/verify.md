@@ -45,52 +45,46 @@ Write VERIFY.md with:
 - Each finding with: severity, description, agents that found it, consensus note (if tiebreaker applied)
 - Action items for CRITICAL/HIGH findings
 
-## 6. Act
+## 6. Act — Auto-Fix Loop
 
-**CRITICAL findings:** Present each finding individually. Do NOT bundle multiple findings together.
+Read `verify.auto_fix` from `.work/config.json`. Defaults: `enabled=true`, `max_iterations=3`.
 
-For EACH CRITICAL finding, use AskUserQuestion:
-- header: "Critical: [finding title]"
-- question: "[One sentence: what is wrong, where, which agent found it]"
-- options:
-  - "Fix now (Recommended)" - dispatch agent to fix this specific issue immediately
-  - "Show details" - see full finding with file path, line number, and code context
-  - "Fix later" - acknowledge and defer; recorded in VERIFY.md as deferred
-  - "Not an issue" - override; you will provide justification recorded in VERIFY.md
+**If `verify.auto_fix.enabled` is false:** skip the loop. Log all findings to VERIFY.md, print summary, done. User reviews and addresses manually.
 
-When user selects "Show details":
-1. Print the full finding: severity, description, file path, line number, code snippet (if available), which agents found it, consensus note if applicable.
-2. Re-present the identical AskUserQuestion (same header, same question, same 4 options).
+**If enabled:** run the loop. No per-finding prompts.
 
-**HIGH findings:** Use the same structure as CRITICAL.
+### Loop
 
-For EACH HIGH finding, use AskUserQuestion:
-- header: "High: [finding title]"
-- question: "[One sentence: what is wrong, where, which agent found it]"
-- options:
-  - "Fix now (Recommended)" - dispatch agent to fix this specific issue immediately
-  - "Show details" - see full finding with file path, line number, and code context
-  - "Fix later" - acknowledge and defer; recorded in VERIFY.md as deferred
-  - "Not an issue" - override; you will provide justification recorded in VERIFY.md
+```
+Iteration N of <max>:
+  1. If zero CRITICAL + HIGH findings: exit loop, PASS.
+  2. Dispatch do-coder (one agent) to fix all CRITICAL + HIGH in one pass.
+     Brief: list every finding with file:line + consensus severity + agents that found it.
+  3. Re-dispatch the same specialists from §3 in parallel. Re-apply §4 consensus.
+  4. If fixes clear all CRITICAL + HIGH: exit loop, PASS.
+  5. If iteration == max: exit loop, FAIL with remaining blockers.
+  6. Else: increment N, go to 1.
+```
 
-When user selects "Show details": same behavior as CRITICAL — print full finding, re-present same question.
+Print status line each iteration:
+```
+Verify auto-fix: iteration N of <max>...
+```
 
-**MEDIUM findings:** Use the same 4-option structure, but "Fix later" is the recommended default.
+If `git.auto_commit` is true, coder auto-commits each iteration with `fix: verify iteration N - <summary>`. Enables trivial rollback via `git reset`.
 
-For EACH MEDIUM finding, use AskUserQuestion:
-- header: "Medium: [finding title]"
-- question: "[One sentence: what is wrong, where, which agent found it]"
-- options:
-  - "Fix later (Recommended)" - defer; recorded in VERIFY.md; address in next iteration
-  - "Fix now" - dispatch agent to fix this issue immediately
-  - "Show details" - see full finding with file path, line number, and code context
-  - "Not an issue" - override; you will provide justification recorded in VERIFY.md
+### After loop
 
-When user selects "Show details": print full finding, re-present same question.
+- **All CRITICAL + HIGH cleared:** write VERIFY.md with pass, all MEDIUM/LOW logged as deferred. Print `Phase verified.` Update STATE.md.
+- **Loop exhausted, blockers remain:** write VERIFY.md with fail, list remaining CRITICAL/HIGH plus every iteration's diff summary. Present ONE AskUserQuestion summarizing the stuck state:
+  - header: "Verify stuck after N iterations"
+  - question: "<count> blockers remain after auto-fix loop. Choose path."
+  - options:
+    - "Show findings and stop (Recommended)" - print full VERIFY.md; user takes over
+    - "Run N more iterations" - extend the loop
+    - "Accept remaining and proceed" - mark deferred, unblock phase
 
-**LOW findings:** Log in VERIFY.md. No AskUserQuestion needed.
-
-**All PASS:** Print "Phase verified." Update STATE.md.
+**MEDIUM and LOW findings:** always logged to VERIFY.md, never prompted. User reads post-hoc.
 
 ## 7. Record Learnings
 

@@ -69,16 +69,9 @@ Print: `Dispatching do-docs to update project documentation.` (when running)
 - **simple**: dispatch `do-reviewer` only.
 - **standard / complex**: dispatch `do-qa` + `do-reviewer` only (fast mode).
 
-For each CRITICAL finding:
+Run the auto-fix loop from `workflows/verify.md` §6 (CRITICAL + HIGH auto-fix, capped iterations, no per-finding prompts). Use `verify.auto_fix` from config.
 
-Use AskUserQuestion:
-- header: "Critical Finding"
-- question: "<description of the finding>"
-- options:
-  - "Fix now (Recommended)" - dispatch agent to fix immediately
-  - "Skip" - proceed without fixing; recorded in VERIFY.md
-
-Otherwise: done.
+If loop exhausts with blockers remaining: surface single summary prompt per `verify.md` §6. Otherwise: done.
 
 ## 9. Done
 
