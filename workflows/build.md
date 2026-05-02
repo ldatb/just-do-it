@@ -13,6 +13,17 @@ Do NOT write application code. Do NOT carry agent results in your context.
 1. Read STATE.md, config.json, phase PLAN.md
 2. If no PLAN.md: error — run `/do:start` to plan first
 
+## 1.5. Create Task Tracker
+
+Before dispatching any agents, use `TodoWrite` to create a task list covering every wave plus docs and verify.
+
+One todo per wave (e.g. `Wave 1: Design — do-architect, do-product`), plus:
+- `Documentation update — do-docs`
+- `Quality verification loop`
+
+Mark each todo `in_progress` when you start it, `completed` when it finishes.
+This tracker is the canonical view of what's done and what's next — update it in real time.
+
 ## 2. Execute Waves
 
 For each wave in PLAN.md:
@@ -25,10 +36,12 @@ For each wave in PLAN.md:
    - `./CLAUDE.md` (if exists)
    - Task details, target file paths, done criteria
 
-2. Dispatch all wave tasks via Agent tool in parallel (up to max_concurrent)
-3. Note results: files modified, success/failure, brief summary
-4. Update STATE.md
-5. Brief status to user: "Wave N complete. [summary]."
+2. Mark this wave's todo `in_progress` via `TodoWrite`
+3. Dispatch all wave tasks via Agent tool in parallel (up to max_concurrent)
+4. Note results: files modified, success/failure, brief summary
+5. Update STATE.md
+6. Mark this wave's todo `completed` via `TodoWrite`
+7. Brief status to user: "Wave N complete. [summary]."
 
 ### Agent Prompt Template
 
@@ -114,6 +127,8 @@ If false: ask user before committing.
 
 After all build waves complete:
 
+Mark `Documentation update — do-docs` todo `in_progress`.
+
 Print: `Dispatching do-docs to update project documentation. (Always runs after build.)`
 
 Then dispatch `do-docs` via Agent tool with:
@@ -125,6 +140,8 @@ Then dispatch `do-docs` via Agent tool with:
 `do-docs` reads what changed and updates any affected documentation (README, CHANGELOG, docs/, etc.)
 Note documentation files modified in BUILD.md.
 
+Mark `Documentation update — do-docs` todo `completed`.
+
 This step is NOT optional. Every build must end with a docs update, even in fast mode.
 
 ## 3.5. Quality Verification Loop (Code Changes Only)
@@ -134,7 +151,7 @@ Skip this step entirely if `verify.auto_fix.enabled` is false in `.work/config.j
 
 Read `verify.auto_fix.max_iterations` from config (default 3).
 
-After build waves and docs update complete, run a verification loop:
+After build waves and docs update complete, mark `Quality verification loop` todo `in_progress`, then run a verification loop:
 
 1. **Dispatch audit agents in parallel:**
    - `do-security`: Security audit of all modified files
@@ -158,6 +175,8 @@ Quality audit: iteration N of <max>...
 No per-finding prompts. MEDIUM and LOW are logged to BUILD.md, never surfaced interactively.
 
 This loop ensures every code change ships with security, performance, and quality validation built in.
+
+Mark `Quality verification loop` todo `completed`.
 
 ## 4. Results
 

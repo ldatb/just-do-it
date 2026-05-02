@@ -117,6 +117,20 @@ Phases:
 
 ## 3. Git Branch
 
+Before doing anything else in this step, use `TodoWrite` to create a task list for the remaining pipeline:
+
+- `Git branch setup`
+- `Research`
+- `Plan`
+- `Build — Wave N` (one entry per wave, derived from PLAN.md once it exists; update/add these when Plan is done)
+- `Documentation update`
+- `Verify`
+- `Complete & merge`
+
+Mark `Git branch setup` as `in_progress` immediately, then `completed` when done.
+Mark each step `in_progress` when you enter it, `completed` when you leave it.
+This tracker is the canonical view of progress — never let it go stale.
+
 If `git.use_branches` is true: print `Creating branch feat/<phase-name>...` then auto-create `feat/<phase-name>` branch.
 
 Type derived from work: feat, fix, refactor, docs, test, chore, perf, ci.
@@ -165,6 +179,10 @@ Use AskUserQuestion:
   - "Change agents" - add or remove specialists from the roster
   - "Change scope" - add or remove tasks from the plan
   - "Stop" - save plan and exit without building
+
+After user approves, update the todo list via `TodoWrite`:
+- Mark `Plan` as `completed`
+- Replace the generic `Build — Wave N` placeholder todos with one todo per actual wave from PLAN.md (e.g. `Wave 1: Design — do-architect`, `Wave 2: Build — do-coder, do-security`)
 
 ## 6. Build
 
@@ -247,6 +265,10 @@ The only files you write: STATE.md, BUILD.md, RESEARCH.md, VERIFY.md, PLAN.md, c
 ## Config Is Law
 
 config.json controls: branches, commits, models, fast mode, agents. Questions are asked ONCE on first run, never again. Everything else runs per config automatically.
+
+## Task Tracking
+
+Use `TodoWrite` at step 3 (Git Branch). Update in real time — `in_progress` when entering a step, `completed` when leaving. Never let the tracker go stale. The todo list is the single source of truth for what's done and what's next, visible to both orchestrator and user at all times.
 
 ## Transparency
 

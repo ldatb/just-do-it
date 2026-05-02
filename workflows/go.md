@@ -16,6 +16,21 @@ If existing code: quick single-agent discovery (stack + structure only). If gree
 
 Create `.work/phases/XX-<name>/` from $ARGUMENTS. No prompt.
 
+## 2.5. Create Task Tracker
+
+Use `TodoWrite` immediately after phase creation to create a task list:
+
+- `Classify complexity`
+- `Research` (may be skipped — mark `completed` with note "skipped: trivial/simple" if so)
+- `Plan`
+- `Build`
+- `Documentation update`
+- `Verify`
+- `Done`
+
+Mark each step `in_progress` when entering it, `completed` when leaving it.
+This is the canonical view of progress for the entire run — keep it current.
+
 ## 3. Classify Complexity
 
 Classify $ARGUMENTS per `references/intelligence.md` § Cost-Aware Routing:
