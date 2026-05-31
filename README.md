@@ -2,11 +2,12 @@
 
 # JUST DO IT
 
-**A full company in a single Claude Code plugin.**
+**A full company in a single plugin. Works with Claude Code and Codex.**
 
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 [![Agents](https://img.shields.io/badge/agents-26-green?style=for-the-badge)]()
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-8A2BE2?style=for-the-badge)]()
+[![Codex](https://img.shields.io/badge/Codex-compatible-10a37f?style=for-the-badge)]()
 
 <br>
 
@@ -253,10 +254,15 @@ cd just-do-it
 ./install.sh
 ```
 
-Installs to `~/.claude/`:
+Installs for both Claude Code and Codex in one step.
+
+**Claude Code** (`~/.claude/`):
 - Agents → `~/.claude/agents/do-*.md`
 - Commands → `~/.claude/commands/do/*.md`
 - Core → `~/.claude/do/` (workflows, templates, references)
+
+**Codex** (`~/.codex/`):
+- Instructions → `~/.codex/instructions.md` (appended with clear markers)
 
 ### Uninstall
 
@@ -264,7 +270,28 @@ Installs to `~/.claude/`:
 ./uninstall.sh
 ```
 
-Project directories (`.work/`) are preserved.
+Removes all installed files from both `~/.claude/` and `~/.codex/`. Project directories (`.work/`) are preserved.
+
+---
+
+## Codex
+
+The same 26 specialist modes and 8-command system, adapted for Codex's single-agent architecture.
+
+Use natural language triggers instead of slash commands:
+
+| Trigger | Equivalent |
+|---------|-----------|
+| `do start: <task>` | `/do:start` |
+| `do it: <task>` | `/do:it` |
+| `do brainstorm: <idea>` | `/do:brainstorm` |
+| `do debug: <issue>` | `/do:debug` |
+| `do review: <target>` | `/do:review` |
+| `do status` | `/do:status` |
+| `do settings` | `/do:settings` |
+| `do help` | `/do:help` |
+
+Specialist roles (coder, architect, security, QA, etc.) are adopted inline rather than dispatched as sub-agents. The `.work/` project state directory is identical between both platforms — projects are portable.
 
 ---
 
@@ -274,6 +301,6 @@ MIT License. See [LICENSE](LICENSE).
 
 <div align="center">
 
-**Claude Code is powerful. Specialist agents make it reliable.**
+**Specialist agents make AI coding tools reliable. Works with Claude Code and Codex.**
 
 </div>
